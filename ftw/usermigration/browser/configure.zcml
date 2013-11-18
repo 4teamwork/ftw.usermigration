@@ -1,0 +1,13 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="ivbe.intranet">
+
+    <include package="plone.app.z3cform" />
+    <browser:page
+        name="user-migration"
+        for="*"
+        class=".migration.UserMigrationForm"
+        permission="ftw.usermigration.migrateUsers" />
+
+</configure>
