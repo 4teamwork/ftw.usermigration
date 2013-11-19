@@ -1,0 +1,74 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="ftw.usermigration">
+<body>
+
+<metal:title fill-slot="content-title">User Migration Results</metal:title>
+
+<metal:content-core fill-slot="content-core">
+    <metal:content-core define-macro="content-core">
+
+    <tal:localroles repeat="mode python:view.results_localroles.keys()">
+    <tal:block define="rows python:view.results_localroles[mode]"
+               condition="rows">
+    <h2>Local roles <span tal:replace="mode" /></h2>
+    <table class="listing">
+        <tr>
+            <th>Path</th>
+            <th>Old UserId</th>
+            <th>New UserId</th>
+        </tr>
+        <tr tal:repeat="row rows">
+            <td tal:content="python: row[0]" />
+            <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
+        </tr>
+    </table>
+    </tal:block>
+    </tal:localroles>
+
+    <tal:localroles repeat="mode python:view.results_dashboard.keys()">
+    <tal:block define="rows python:view.results_dashboard[mode]"
+               condition="rows">
+    <h2>Dashboards <span tal:replace="mode" /></h2>
+    <table class="listing">
+        <tr>
+            <th>Column</th>
+            <th>Old UserId</th>
+            <th>New UserId</th>
+        </tr>
+        <tr tal:repeat="row rows">
+            <td tal:content="python: row[0]" />
+            <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
+        </tr>
+    </table>
+    </tal:block>
+    </tal:localroles>
+
+    <tal:localroles repeat="mode python:view.results_homefolder.keys()">
+    <tal:block define="rows python:view.results_homefolder[mode]"
+               condition="rows">
+    <h2>Homefolders <span tal:replace="mode" /></h2>
+    <table class="listing">
+        <tr>
+            <th>Old UserId</th>
+            <th>New UserId</th>
+        </tr>
+        <tr tal:repeat="row rows">
+            <td tal:content="python: row[0]" />
+            <td tal:content="python: row[1]" />
+        </tr>
+    </table>
+    </tal:block>
+    </tal:localroles>
+
+    </metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

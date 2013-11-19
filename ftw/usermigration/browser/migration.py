@@ -71,6 +71,9 @@ class UserMigrationForm(form.Form):
     def __init__(self, context, request):
         super(UserMigrationForm, self).__init__(context, request)
         self.result_template = None
+        self.results_localroles = {}
+        self.results_dashboard = {}
+        self.results_homefolder = {}
 
     @button.buttonAndHandler(u'Migrate')
     def handleMigrate(self, action):
@@ -91,15 +94,16 @@ class UserMigrationForm(form.Form):
             userids[old_userid] = new_userid
 
         if data['migrate_dashboards']:
-            dashboard_results = migrate_dashboards(context, userids, 
+            self.results_dashboard = migrate_dashboards(context, userids, 
                 mode=data['mode'], replace=data['replace'])
 
         if data['migrate_homefolders']:
-            homefolder_results = migrate_homefolders(context, userids,
-                mode=data['mode'])
+            self.results_homefolder = homefolder_results = migrate_homefolders(
+                context, userids, mode=data['mode'])
 
         if data['migrate_localroles']:
-            migrate_localroles(context, userids, mode=data['mode'])
+            self.results_localroles = migrate_localroles(context, userids,
+                mode=data['mode'])
 
         self.result_template = ViewPageTemplateFile('migration.pt')
 
