@@ -43,6 +43,6 @@ def migrate_dashboards(context, mapping, mode='move', replace=False):
                         # Remove assignment from old user
                         elif mode == 'delete':
                             del category[old_userid]
-                            deleted.append((name, old_userid))
+                            deleted.append((name, old_userid, None))
 
     return(dict(moved=moved, copied=copied, deleted=deleted))

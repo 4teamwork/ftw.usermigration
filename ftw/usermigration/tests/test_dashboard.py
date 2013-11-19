@@ -167,7 +167,7 @@ class TestLocalRoles(TestCase):
         self.assertNotIn('john', category2)
         self.assertNotIn('john', category3)
 
-        self.assertIn(('plone.dashboard2', 'john'), results['deleted'])
-        self.assertIn(('plone.dashboard3', 'john'), results['deleted'])
+        self.assertIn(('plone.dashboard2', 'john', None), results['deleted'])
+        self.assertIn(('plone.dashboard3', 'john', None), results['deleted'])
         self.assertEqual([], results['moved'])
         self.assertEqual([], results['copied'])
