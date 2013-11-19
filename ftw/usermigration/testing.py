@@ -2,7 +2,6 @@ from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import applyProfile
 from zope.configuration import xmlconfig
 
 
@@ -19,9 +18,6 @@ class UserMigrationLayer(PloneSandboxLayer):
             '  <includePlugins package="plone" />'
             '</configure>',
             context=configurationContext)
-
-    # def setUpPloneSite(self, portal):
-    #     applyProfile(portal, 'ftw.usermigration:default')
 
 
 USERMIGRATION_FIXTURE = UserMigrationLayer()
