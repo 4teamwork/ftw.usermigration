@@ -2,7 +2,6 @@ import transaction
 from Acquisition import aq_inner
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope import interface, schema
-from zope.component import getUtility
 from z3c.form import form, field, button
 from z3c.form.interfaces import WidgetActionExecutionError
 from ftw.usermigration import _
@@ -59,8 +58,15 @@ class IUserMigrationFormSchema(interface.Interface):
         title=_(u'label_replace', default=u"Replace Existing Data"),
         description=_(u'help_replace', default=u'Check this option to replace '
           'existing user data. If unchecked, user data is not migrated when it'
-          'already exists for a given userid.'),
+          ' already exists for a given userid.'),
         default=False,
+    )
+
+    dry_run = schema.Bool(
+        title=_(u'label_dry_run', default=u'Dry Run'),
+        default=False,
+        description=_(u'help_dry_run', default=u'Check this option to not '
+          'modify any data and to see what would have been migrated.'),
     )
 
 class UserMigrationForm(form.Form):
@@ -98,12 +104,15 @@ class UserMigrationForm(form.Form):
                 mode=data['mode'], replace=data['replace'])
 
         if data['migrate_homefolders']:
-            self.results_homefolder = homefolder_results = migrate_homefolders(
-                context, userids, mode=data['mode'])
+            self.results_homefolder = migrate_homefolders(context, userids,
+                mode=data['mode'], replace=data['replace'])
 
         if data['migrate_localroles']:
             self.results_localroles = migrate_localroles(context, userids,
                 mode=data['mode'])
+
+        if data['dry_run']:
+            transaction.abort()
 
         self.result_template = ViewPageTemplateFile('migration.pt')
 
