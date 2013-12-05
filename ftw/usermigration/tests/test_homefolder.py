@@ -18,14 +18,17 @@ class HomefolderMigrationTest(TestCase):
         # Create some users
         mtool = getToolByName(portal, 'portal_membership', None)
         mtool.addMember('john', 'password', ['Member'], [])
+        mtool.addMember('john@domain.net', 'password', ['Member'], [])
         mtool.addMember('jack', 'password', ['Member'], [])
         mtool.addMember('peter', 'password', ['Member'], [])
+        mtool.addMember('peter@domain.net', 'password', ['Member'], [])
 
         # Create home folders
         self.folder = portal[portal.invokeFactory('Folder', 'Members')]
         mtool.setMemberareaCreationFlag()
         mtool.createMemberArea(member_id='john')
         mtool.createMemberArea(member_id='jack')
+        mtool.createMemberArea(member_id='john@domain.net')
         # Create some content
         johns_home = mtool.getHomeFolder('john')
         johns_home.invokeFactory('Folder', 'folder1')
@@ -99,3 +102,16 @@ class HomefolderMigrationTest(TestCase):
         self.assertIn(('john', None), results['deleted'])
         self.assertEquals([], results['moved'])
         self.assertEquals([], results['copied'])
+
+    def test_migrate_homefolder_with_urlquoted_id(self):
+        portal = self.layer['portal']
+        mapping = {'john@domain.net': 'peter@domain.net'}
+        results = migrate_homefolders(portal, mapping)
+
+        mtool = getToolByName(portal, 'portal_membership', None)
+        self.assertEquals(None, mtool.getHomeFolder(id='john@domain.net'))
+        self.assertNotEquals(None, mtool.getHomeFolder(id='peter@domain.net'))
+        
+        self.assertIn(('john@domain.net', 'peter@domain.net'), results['moved'])
+        self.assertEquals([], results['copied'])
+        self.assertEquals([], results['deleted'])
