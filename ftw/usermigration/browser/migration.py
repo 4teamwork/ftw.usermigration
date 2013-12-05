@@ -120,6 +120,10 @@ class UserMigrationForm(form.Form):
     def handleCancel(self, action):
         self.request.response.redirect(self.context.absolute_url())
 
+    def updateWidgets(self):
+        super(UserMigrationForm, self).updateWidgets()
+        self.widgets['user_mapping'].rows = 15
+
     def render(self):
         self.request.set('disable_border', True)
         if self.result_template:
