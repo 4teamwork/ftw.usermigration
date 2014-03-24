@@ -8,13 +8,13 @@ from ftw.usermigration import _
 from ftw.usermigration.dashboard import migrate_dashboards
 from ftw.usermigration.localroles import migrate_localroles
 from ftw.usermigration.homefolder import migrate_homefolders
+from ftw.usermigration.users import migrate_users
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from zope.interface import Invalid
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 
 
 class IUserMigrationFormSchema(interface.Interface):
-
 
     user_mapping = schema.List(
         title=_(u'label_user_mapping', default=u'User Mapping'),
@@ -28,9 +28,11 @@ class IUserMigrationFormSchema(interface.Interface):
 
     migrations = schema.List(
         title=_(u'label_migrations', default=u'Migrations'),
-        description=_(u'help_migrations', default=u'Select one or more migrations that should be run.'),
+        description=_(u'help_migrations', default=u'Select one or more '
+                      'migrations that should be run.'),
         value_type=schema.Choice(
             vocabulary=SimpleVocabulary([
+                SimpleTerm('users', 'users', _(u'Users')),
                 SimpleTerm('localroles', 'localroles', _(u'Local Roles')),
                 SimpleTerm('dashboard', 'dashboard', _(u"Dashboard")),
                 SimpleTerm('homefolder', 'homefolder', _(u"Home Folder")),
@@ -98,8 +100,12 @@ class UserMigrationForm(form.Form):
                     Invalid('Invalid user mapping provided.'))
             userids[old_userid] = new_userid
 
+        if 'users' in data['migrations']:
+            self.results_users = migrate_users(context, userids,
+                mode=data['mode'], replace=data['replace'])
+
         if 'dashboard' in data['migrations']:
-            self.results_dashboard = migrate_dashboards(context, userids, 
+            self.results_dashboard = migrate_dashboards(context, userids,
                 mode=data['mode'], replace=data['replace'])
 
         if 'homefolder' in data['migrations']:

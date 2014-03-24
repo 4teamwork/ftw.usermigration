@@ -12,6 +12,23 @@
 <metal:content-core fill-slot="content-core">
     <metal:content-core define-macro="content-core">
 
+    <tal:users repeat="mode python:view.results_users.keys()">
+    <tal:block define="rows python:view.results_users[mode]"
+               condition="rows">
+    <h2>Users <span tal:replace="mode" /></h2>
+    <table class="listing">
+        <tr>
+            <th>Old UserId</th>
+            <th>New UserId</th>
+        </tr>
+        <tr tal:repeat="row rows">
+            <td tal:content="python: row[0]" />
+            <td tal:content="python: row[1]" />
+        </tr>
+    </table>
+    </tal:block>
+    </tal:users>
+
     <tal:localroles repeat="mode python:view.results_localroles.keys()">
     <tal:block define="rows python:view.results_localroles[mode]"
                condition="rows">

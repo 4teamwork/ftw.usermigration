@@ -7,6 +7,8 @@ renamed.
 
 Currently the following user data can be migrated:
 
+- Users 
+
 - Local Roles
 
 - Dashboards
@@ -18,8 +20,6 @@ Todo:
 - User Properties
 
 - Groups
-
-- Users
 
 
 Installation
