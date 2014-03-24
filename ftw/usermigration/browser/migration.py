@@ -10,6 +10,7 @@ from ftw.usermigration.localroles import migrate_localroles
 from ftw.usermigration.homefolder import migrate_homefolders
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from zope.interface import Invalid
+from z3c.form.browser.checkbox import CheckBoxFieldWidget
 
 
 class IUserMigrationFormSchema(interface.Interface):
@@ -25,19 +26,17 @@ class IUserMigrationFormSchema(interface.Interface):
         required=True,
     )
 
-    migrate_localroles = schema.Bool(
-        title=_(u'label_migrate_localroles', default=u'Migrate Local Roles'),
-        default=False,
-    )
-
-    migrate_dashboards = schema.Bool(
-        title=_(u'label_migrate_dashboards', default=u'Migrate Dashboards'),
-        default=False,
-    )
-
-    migrate_homefolders = schema.Bool(
-        title=_(u'label_migrate_homefolders', default=u'Migrate Home Folders'),
-        default=False,
+    migrations = schema.List(
+        title=_(u'label_migrations', default=u'Migrations'),
+        description=_(u'help_migrations', default=u'Select one or more migrations that should be run.'),
+        value_type=schema.Choice(
+            vocabulary=SimpleVocabulary([
+                SimpleTerm('localroles', 'localroles', _(u'Local Roles')),
+                SimpleTerm('dashboard', 'dashboard', _(u"Dashboard")),
+                SimpleTerm('homefolder', 'homefolder', _(u"Home Folder")),
+            ]),
+        ),
+        required=True,
     )
 
     mode = schema.Choice(
@@ -99,15 +98,15 @@ class UserMigrationForm(form.Form):
                     Invalid('Invalid user mapping provided.'))
             userids[old_userid] = new_userid
 
-        if data['migrate_dashboards']:
+        if 'dashboard' in data['migrations']:
             self.results_dashboard = migrate_dashboards(context, userids, 
                 mode=data['mode'], replace=data['replace'])
 
-        if data['migrate_homefolders']:
+        if 'homefolder' in data['migrations']:
             self.results_homefolder = migrate_homefolders(context, userids,
                 mode=data['mode'], replace=data['replace'])
 
-        if data['migrate_localroles']:
+        if 'localroles' in data['migrations']:
             self.results_localroles = migrate_localroles(context, userids,
                 mode=data['mode'])
 
@@ -123,6 +122,7 @@ class UserMigrationForm(form.Form):
     def updateWidgets(self):
         super(UserMigrationForm, self).updateWidgets()
         self.widgets['user_mapping'].rows = 15
+        self.fields['migrations'].widgetFactory = CheckBoxFieldWidget
 
     def render(self):
         self.request.set('disable_border', True)
