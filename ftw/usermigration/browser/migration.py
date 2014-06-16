@@ -83,6 +83,7 @@ class UserMigrationForm(form.Form):
         self.results_localroles = {}
         self.results_dashboard = {}
         self.results_homefolder = {}
+        self.results_users = {}
         self.results_properties = {}
 
     @button.buttonAndHandler(u'Migrate')
