@@ -7,7 +7,9 @@ renamed.
 
 Currently the following user data can be migrated:
 
-- Users 
+- Users (ZODB User Manager)
+
+- User Properties (ZODB Mutable Property Provider)
 
 - Local Roles
 
@@ -16,8 +18,6 @@ Currently the following user data can be migrated:
 - Home Folders
 
 Todo:
-
-- User Properties
 
 - Groups
 

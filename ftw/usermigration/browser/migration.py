@@ -9,6 +9,7 @@ from ftw.usermigration.dashboard import migrate_dashboards
 from ftw.usermigration.localroles import migrate_localroles
 from ftw.usermigration.homefolder import migrate_homefolders
 from ftw.usermigration.users import migrate_users
+from ftw.usermigration.properties import migrate_properties
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from zope.interface import Invalid
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
@@ -36,6 +37,7 @@ class IUserMigrationFormSchema(interface.Interface):
                 SimpleTerm('localroles', 'localroles', _(u'Local Roles')),
                 SimpleTerm('dashboard', 'dashboard', _(u"Dashboard")),
                 SimpleTerm('homefolder', 'homefolder', _(u"Home Folder")),
+                SimpleTerm('properties', 'properties', _(u"User Properties")),
             ]),
         ),
         required=True,
@@ -81,6 +83,7 @@ class UserMigrationForm(form.Form):
         self.results_localroles = {}
         self.results_dashboard = {}
         self.results_homefolder = {}
+        self.results_properties = {}
 
     @button.buttonAndHandler(u'Migrate')
     def handleMigrate(self, action):
@@ -102,6 +105,10 @@ class UserMigrationForm(form.Form):
 
         if 'users' in data['migrations']:
             self.results_users = migrate_users(context, userids,
+                mode=data['mode'], replace=data['replace'])
+
+        if 'properties' in data['migrations']:
+            self.results_properties = migrate_properties(context, userids,
                 mode=data['mode'], replace=data['replace'])
 
         if 'dashboard' in data['migrations']:
