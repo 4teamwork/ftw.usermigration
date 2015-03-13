@@ -18,6 +18,9 @@ class DummyPortletAssignment(object):
     def __repr__(self):
         return self.name
 
+    def __of__(self, obj):
+        return self
+
 
 class TestLocalRoles(TestCase):
 
