@@ -9,8 +9,8 @@ from Products.CMFCore.utils import getToolByName
 class TestLocalRoles(TestCase):
 
     layer = USERMIGRATION_INTEGRATION_TESTING
-    
-    def setUp(self):        
+
+    def setUp(self):
         portal = self.layer['portal']
         setRoles(portal, TEST_USER_ID, ['Manager'])
 
@@ -107,7 +107,7 @@ class TestLocalRoles(TestCase):
         portal = self.layer['portal']
         mapping = {'john': 'peter'}
         results = migrate_localroles(portal, mapping, mode='copy')
-        
+
         self.assertIn(('/plone/folder', 'john', 'peter'), results['copied'])
         self.assertEquals([], results['moved'])
         self.assertEquals([], results['deleted'])
@@ -118,7 +118,7 @@ class TestLocalRoles(TestCase):
         portal = self.layer['portal']
         mapping = {'john': 'peter'}
         results = migrate_localroles(portal, mapping, mode='delete')
-        
+
         self.assertIn(('/plone/folder', 'john', None), results['deleted'])
         self.assertEquals([], results['moved'])
         self.assertEquals([], results['copied'])

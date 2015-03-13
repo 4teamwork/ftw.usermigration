@@ -1,5 +1,5 @@
-from plone.portlets.interfaces import IPortletManager
 from plone.portlets.constants import USER_CATEGORY
+from plone.portlets.interfaces import IPortletManager
 from zope.component import queryUtility
 
 
