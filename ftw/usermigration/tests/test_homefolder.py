@@ -1,17 +1,17 @@
-from unittest2 import TestCase
+from ftw.usermigration.homefolder import migrate_homefolders
+from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
-from ftw.usermigration.homefolder import migrate_homefolders
 from Products.CMFCore.utils import getToolByName
-
+from unittest2 import TestCase
 import transaction
+
 
 class HomefolderMigrationTest(TestCase):
 
     layer = USERMIGRATION_INTEGRATION_TESTING
-    
-    def setUp(self):        
+
+    def setUp(self):
         portal = self.layer['portal']
         setRoles(portal, TEST_USER_ID, ['Manager'])
 
@@ -32,7 +32,7 @@ class HomefolderMigrationTest(TestCase):
         # Create some content
         johns_home = mtool.getHomeFolder('john')
         johns_home.invokeFactory('Folder', 'folder1')
-        
+
         # Objects need a DB connection to be copyable
         transaction.savepoint()
 
@@ -54,7 +54,7 @@ class HomefolderMigrationTest(TestCase):
         portal = self.layer['portal']
         mapping = {'john': 'peter'}
         migrate_homefolders(portal, mapping)
-        
+
         self.assertIn(
             ('peter', ('Owner',)),
             self.folder['peter'].get_local_roles()
@@ -111,7 +111,7 @@ class HomefolderMigrationTest(TestCase):
         mtool = getToolByName(portal, 'portal_membership', None)
         self.assertEquals(None, mtool.getHomeFolder(id='john@domain.net'))
         self.assertNotEquals(None, mtool.getHomeFolder(id='peter@domain.net'))
-        
+
         self.assertIn(('john@domain.net', 'peter@domain.net'), results['moved'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['deleted'])

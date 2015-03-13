@@ -1,18 +1,18 @@
-import transaction
 from Acquisition import aq_inner
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from zope import interface, schema
-from z3c.form import form, field, button
-from z3c.form.interfaces import WidgetActionExecutionError
 from ftw.usermigration import _
 from ftw.usermigration.dashboard import migrate_dashboards
-from ftw.usermigration.localroles import migrate_localroles
 from ftw.usermigration.homefolder import migrate_homefolders
-from ftw.usermigration.users import migrate_users
+from ftw.usermigration.localroles import migrate_localroles
 from ftw.usermigration.properties import migrate_properties
-from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
-from zope.interface import Invalid
+from ftw.usermigration.users import migrate_users
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from z3c.form import form, field, button
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
+from z3c.form.interfaces import WidgetActionExecutionError
+from zope import interface, schema
+from zope.interface import Invalid
+from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
+import transaction
 
 
 class IUserMigrationFormSchema(interface.Interface):
@@ -46,8 +46,8 @@ class IUserMigrationFormSchema(interface.Interface):
     mode = schema.Choice(
         title=_(u'label_migration_mode', default='Mode'),
         description=_(u'help_migration_mode', default=u'Choose a migration '
-          'mode. Copy will keep user data of the old user. Delete will just '
-          'remove user data of the old user.'),
+            'mode. Copy will keep user data of the old user. Delete will just '
+            'remove user data of the old user.'),
         vocabulary=SimpleVocabulary([
             SimpleTerm('move', 'move', _(u'Move')),
             SimpleTerm('copy', 'copy', _(u"Copy")),
@@ -72,9 +72,10 @@ class IUserMigrationFormSchema(interface.Interface):
           'modify any data and to see what would have been migrated.'),
     )
 
+
 class UserMigrationForm(form.Form):
     fields = field.Fields(IUserMigrationFormSchema)
-    ignoreContext = True # don't use context to get widget data
+    ignoreContext = True  # don't use context to get widget data
     label = u"Migrate UserIDs"
 
     def __init__(self, context, request):
@@ -100,29 +101,29 @@ class UserMigrationForm(form.Form):
             try:
                 old_userid, new_userid = line.split(':')
             except ValueError:
-                raise WidgetActionExecutionError('user_mapping',
-                    Invalid('Invalid user mapping provided.'))
+                raise WidgetActionExecutionError(
+                    'user_mapping', Invalid('Invalid user mapping provided.'))
             userids[old_userid] = new_userid
 
         if 'users' in data['migrations']:
-            self.results_users = migrate_users(context, userids,
-                mode=data['mode'], replace=data['replace'])
+            self.results_users = migrate_users(
+                context, userids, mode=data['mode'], replace=data['replace'])
 
         if 'properties' in data['migrations']:
-            self.results_properties = migrate_properties(context, userids,
-                mode=data['mode'], replace=data['replace'])
+            self.results_properties = migrate_properties(
+                context, userids, mode=data['mode'], replace=data['replace'])
 
         if 'dashboard' in data['migrations']:
-            self.results_dashboard = migrate_dashboards(context, userids,
-                mode=data['mode'], replace=data['replace'])
+            self.results_dashboard = migrate_dashboards(
+                context, userids, mode=data['mode'], replace=data['replace'])
 
         if 'homefolder' in data['migrations']:
-            self.results_homefolder = migrate_homefolders(context, userids,
-                mode=data['mode'], replace=data['replace'])
+            self.results_homefolder = migrate_homefolders(
+                context, userids, mode=data['mode'], replace=data['replace'])
 
         if 'localroles' in data['migrations']:
-            self.results_localroles = migrate_localroles(context, userids,
-                mode=data['mode'])
+            self.results_localroles = migrate_localroles(
+                context, userids, mode=data['mode'])
 
         if data['dry_run']:
             transaction.abort()

@@ -1,9 +1,9 @@
-from unittest2 import TestCase
+from ftw.usermigration.properties import migrate_properties
+from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
-from ftw.usermigration.properties import migrate_properties
 from Products.CMFCore.utils import getToolByName
+from unittest2 import TestCase
 
 
 class TestProperties(TestCase):

@@ -1,9 +1,9 @@
-from unittest2 import TestCase
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
 from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
 from ftw.usermigration.users import migrate_users
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
 from Products.CMFCore.utils import getToolByName
+from unittest2 import TestCase
 
 
 class TestUsers(TestCase):

@@ -1,5 +1,5 @@
-from Products.CMFCore.utils import getToolByName
 from Acquisition import aq_parent
+from Products.CMFCore.utils import getToolByName
 
 
 def migrate_homefolders(context, mapping, mode='move', replace=False):
@@ -32,13 +32,13 @@ def migrate_homefolders(context, mapping, mode='move', replace=False):
                     continue
 
         # Rename home folder
-        if mode=='move':
+        if mode == 'move':
             container.manage_renameObject(old_home_id, new_home_id)
             new_home = container[new_home_id]
             moved.append((old_userid, new_userid))
 
         # Copy home folder
-        elif mode=='copy':
+        elif mode == 'copy':
             new_ids = container.manage_pasteObjects(
                 cb_copy_data=container.manage_copyObjects(ids=[old_home_id]))
             container.manage_renameObject(new_ids[0]['new_id'], new_home_id)
@@ -46,7 +46,7 @@ def migrate_homefolders(context, mapping, mode='move', replace=False):
             copied.append((old_userid, new_userid))
 
         # Delete home folder
-        elif mode=='delete':
+        elif mode == 'delete':
             container.manage_delObjects(ids=[old_home_id])
             deleted.append((old_userid, None))
 

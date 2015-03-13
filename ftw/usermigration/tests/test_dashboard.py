@@ -1,28 +1,32 @@
-from unittest2 import TestCase
+from ftw.usermigration.dashboard import migrate_dashboards
+from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
+from plone.app.portlets.storage import UserPortletAssignmentMapping
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
-from ftw.usermigration.dashboard import migrate_dashboards
-from Products.CMFCore.utils import getToolByName
 from plone.portlets.constants import USER_CATEGORY
 from plone.portlets.interfaces import IPortletManager
+from Products.CMFCore.utils import getToolByName
+from unittest2 import TestCase
 from zope.component import queryUtility
-from plone.app.portlets.storage import UserPortletAssignmentMapping
 
 
 class DummyPortletAssignment(object):
-    
+
     def __init__(self, name):
         self.name = name
+
     def __repr__(self):
         return self.name
+
+    def __of__(self, obj):
+        return self
 
 
 class TestLocalRoles(TestCase):
 
     layer = USERMIGRATION_INTEGRATION_TESTING
-    
-    def setUp(self):        
+
+    def setUp(self):
         portal = self.layer['portal']
         setRoles(portal, TEST_USER_ID, ['Manager'])
 
@@ -40,7 +44,7 @@ class TestLocalRoles(TestCase):
             for user in users:
                 if user in category:
                     del category[user]
-        
+
         # Assign portlets in column 'plone.dashboard2'
         column = queryUtility(IPortletManager, name='plone.dashboard2')
         category = column.get(USER_CATEGORY)
@@ -79,7 +83,6 @@ class TestLocalRoles(TestCase):
         self.assertIn('peter', category3)
         self.assertEqual('peter-col3', category3['peter']['portlet-1'].name)
 
-
         self.assertIn(('plone.dashboard2', 'john', 'peter'), results['moved'])
         self.assertNotIn(('plone.dashboard3', 'john', 'peter'), results['moved'])
         self.assertEqual([], results['copied'])
@@ -93,11 +96,11 @@ class TestLocalRoles(TestCase):
         category2 = column2.get(USER_CATEGORY, None)
         column3 = queryUtility(IPortletManager, name='plone.dashboard3')
         category3 = column3.get(USER_CATEGORY, None)
-        
+
         self.assertIn('peter', category2)
         self.assertNotIn('john', category2)
         self.assertEqual('john-col2', category2['peter']['portlet-1'].name)
-        
+
         self.assertIn('peter', category3)
         self.assertNotIn('john', category3)
         self.assertEqual('john-col3', category3['peter']['portlet-1'].name)

@@ -1,5 +1,5 @@
-from Products.CMFCore.utils import getToolByName
 from copy import deepcopy
+from Products.CMFCore.utils import getToolByName
 
 
 def migrate_properties(context, mapping, mode='move', replace=False):
