@@ -11,7 +11,8 @@ from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.interfaces import WidgetActionExecutionError
 from zope import interface, schema
 from zope.interface import Invalid
-from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
+from zope.schema.vocabulary import SimpleTerm
+from zope.schema.vocabulary import SimpleVocabulary
 import transaction
 
 
