@@ -19,7 +19,8 @@ class IUserMigrationFormSchema(interface.Interface):
 
     user_mapping = schema.List(
         title=_(u'label_user_mapping', default=u'User Mapping'),
-        description=_(u'help_user_mapping', default=u'Provide a pair of old '
+        description=_(u'help_user_mapping',
+                      default=u'Provide a pair of old '
                       'and new userid separated by a colon per line (e.g. '
                       'olduserid:newuserid).'),
         default=[],
@@ -45,9 +46,10 @@ class IUserMigrationFormSchema(interface.Interface):
 
     mode = schema.Choice(
         title=_(u'label_migration_mode', default='Mode'),
-        description=_(u'help_migration_mode', default=u'Choose a migration '
-            'mode. Copy will keep user data of the old user. Delete will just '
-            'remove user data of the old user.'),
+        description=_(u'help_migration_mode',
+                      default=u'Choose a migration '
+                      'mode. Copy will keep user data of the old user. Delete '
+                      'will just remove user data of the old user.'),
         vocabulary=SimpleVocabulary([
             SimpleTerm('move', 'move', _(u'Move')),
             SimpleTerm('copy', 'copy', _(u"Copy")),
@@ -59,17 +61,19 @@ class IUserMigrationFormSchema(interface.Interface):
 
     replace = schema.Bool(
         title=_(u'label_replace', default=u"Replace Existing Data"),
-        description=_(u'help_replace', default=u'Check this option to replace '
-          'existing user data. If unchecked, user data is not migrated when it'
-          ' already exists for a given userid.'),
+        description=_(u'help_replace',
+                      default=u'Check this option to replace existing user '
+                      'data. If unchecked, user data is not migrated when it'
+                      ' already exists for a given userid.'),
         default=False,
     )
 
     dry_run = schema.Bool(
         title=_(u'label_dry_run', default=u'Dry Run'),
         default=False,
-        description=_(u'help_dry_run', default=u'Check this option to not '
-          'modify any data and to see what would have been migrated.'),
+        description=_(u'help_dry_run',
+                      default=u'Check this option to not modify any data and '
+                      'to see what would have been migrated.'),
     )
 
 
