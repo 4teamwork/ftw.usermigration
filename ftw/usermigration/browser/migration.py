@@ -17,14 +17,14 @@ import transaction
 
 class IUserMigrationFormSchema(interface.Interface):
 
-    user_mapping = schema.List(
-        title=_(u'label_user_mapping', default=u'User Mapping'),
-        description=_(u'help_user_mapping',
-                      default=u'Provide a pair of old '
-                      'and new userid separated by a colon per line (e.g. '
-                      'olduserid:newuserid).'),
+    principal_mapping = schema.List(
+        title=_(u'label_principal_mapping', default=u'Principal Mapping'),
+        description=_(u'help_principal_mapping',
+                      default=u'Provide a pair of old and new principal IDs '
+                      '(user or group) and new ID separated by a colon per '
+                      'line (e.g. olduserid:newuserid).'),
         default=[],
-        value_type=schema.ASCIILine(title=u"User Mapping Line"),
+        value_type=schema.ASCIILine(title=u"Principal Mapping Line"),
         required=True,
     )
 
@@ -48,8 +48,9 @@ class IUserMigrationFormSchema(interface.Interface):
         title=_(u'label_migration_mode', default='Mode'),
         description=_(u'help_migration_mode',
                       default=u'Choose a migration '
-                      'mode. Copy will keep user data of the old user. Delete '
-                      'will just remove user data of the old user.'),
+                      'mode. Copy will keep user or group data of the old '
+                      'principal. Delete will just remove data of the old '
+                      'principal.'),
         vocabulary=SimpleVocabulary([
             SimpleTerm('move', 'move', _(u'Move')),
             SimpleTerm('copy', 'copy', _(u"Copy")),
@@ -62,9 +63,10 @@ class IUserMigrationFormSchema(interface.Interface):
     replace = schema.Bool(
         title=_(u'label_replace', default=u"Replace Existing Data"),
         description=_(u'help_replace',
-                      default=u'Check this option to replace existing user '
-                      'data. If unchecked, user data is not migrated when it'
-                      ' already exists for a given userid.'),
+                      default=u'Check this option to replace existing user or '
+                      'group data. If unchecked, user or group data is not '
+                      'migrated when it already exists for a given principal '
+                      'ID.'),
         default=False,
     )
 
@@ -80,7 +82,7 @@ class IUserMigrationFormSchema(interface.Interface):
 class UserMigrationForm(form.Form):
     fields = field.Fields(IUserMigrationFormSchema)
     ignoreContext = True  # don't use context to get widget data
-    label = u"Migrate UserIDs"
+    label = u"Migrate principals"
 
     def __init__(self, context, request):
         super(UserMigrationForm, self).__init__(context, request)
@@ -100,34 +102,39 @@ class UserMigrationForm(form.Form):
             self.status = self.formErrorsMessage
             return
 
-        userids = {}
-        for line in data['user_mapping']:
+        principal_ids = {}
+        for line in data['principal_mapping']:
             try:
-                old_userid, new_userid = line.split(':')
+                old_id, new_id = line.split(':')
             except ValueError:
                 raise WidgetActionExecutionError(
-                    'user_mapping', Invalid('Invalid user mapping provided.'))
-            userids[old_userid] = new_userid
+                    'principal_mapping',
+                    Invalid('Invalid principal mapping provided.'))
+            principal_ids[old_id] = new_id
 
         if 'users' in data['migrations']:
             self.results_users = migrate_users(
-                context, userids, mode=data['mode'], replace=data['replace'])
+                context, principal_ids, mode=data['mode'],
+                replace=data['replace'])
 
         if 'properties' in data['migrations']:
             self.results_properties = migrate_properties(
-                context, userids, mode=data['mode'], replace=data['replace'])
+                context, principal_ids, mode=data['mode'],
+                replace=data['replace'])
 
         if 'dashboard' in data['migrations']:
             self.results_dashboard = migrate_dashboards(
-                context, userids, mode=data['mode'], replace=data['replace'])
+                context, principal_ids, mode=data['mode'],
+                replace=data['replace'])
 
         if 'homefolder' in data['migrations']:
             self.results_homefolder = migrate_homefolders(
-                context, userids, mode=data['mode'], replace=data['replace'])
+                context, principal_ids, mode=data['mode'],
+                replace=data['replace'])
 
         if 'localroles' in data['migrations']:
             self.results_localroles = migrate_localroles(
-                context, userids, mode=data['mode'])
+                context, principal_ids, mode=data['mode'])
 
         if data['dry_run']:
             transaction.abort()
@@ -140,7 +147,7 @@ class UserMigrationForm(form.Form):
 
     def updateWidgets(self):
         super(UserMigrationForm, self).updateWidgets()
-        self.widgets['user_mapping'].rows = 15
+        self.widgets['principal_mapping'].rows = 15
         self.fields['migrations'].widgetFactory = CheckBoxFieldWidget
 
     def render(self):

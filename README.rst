@@ -1,9 +1,9 @@
 Introduction
 ============
 
-This product allows migrating various user specific data associated with a 
-userid to an other userid. It's especially usefuel if userids have to be
-renamed.
+This product allows migrating various user specific data associated with a
+principal ID (user or group) to an other principal ID. It's especially useful
+if IDs have to be renamed.
 
 Currently the following user data can be migrated:
 
