@@ -5,6 +5,8 @@ version = '1.1.dev0'
 
 tests_require = [
     'plone.app.testing',
+    'ftw.builder',
+    'ftw.testbrowser',
     ]
 
 setup(name='ftw.usermigration',

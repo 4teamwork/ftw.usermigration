@@ -2,14 +2,17 @@ from Acquisition import aq_inner
 from ftw.usermigration import _
 from ftw.usermigration.dashboard import migrate_dashboards
 from ftw.usermigration.homefolder import migrate_homefolders
+from ftw.usermigration.interfaces import IPrincipalMappingSource
 from ftw.usermigration.localroles import migrate_localroles
 from ftw.usermigration.properties import migrate_properties
 from ftw.usermigration.users import migrate_users
+from ftw.usermigration.vocabularies import USE_MANUAL_MAPPING
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from z3c.form import form, field, button
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
 from z3c.form.interfaces import WidgetActionExecutionError
 from zope import interface, schema
+from zope.component import getMultiAdapter
 from zope.interface import Invalid
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
@@ -18,15 +21,28 @@ import transaction
 
 class IUserMigrationFormSchema(interface.Interface):
 
-    principal_mapping = schema.List(
-        title=_(u'label_principal_mapping', default=u'Principal Mapping'),
-        description=_(u'help_principal_mapping',
-                      default=u'Provide a pair of old and new principal IDs '
-                      '(user or group) and new ID separated by a colon per '
-                      'line (e.g. olduserid:newuserid).'),
+    mapping_source = schema.Choice(
+        title=_(u'label_mapping_source', default='Principal Mapping Source'),
+        description=_(u'help_mapping_source',
+                      default=u'Choose a source for the principal mapping. '
+                      'Select either a programmatically defined mapping (see '
+                      'README) or choose "Use manually entered mapping" and '
+                      'enter your mapping in the form below'),
+        vocabulary='ftw.usermigration.mapping_sources',
+        default=USE_MANUAL_MAPPING,
+        required=True,
+    )
+
+    manual_mapping = schema.List(
+        title=_(u'label_manual_mapping', default=u'Manual Principal Mapping'),
+        description=_(u'help_manual_mapping',
+                      default=u'If you selected "Use manually entered '
+                      'mapping" above, provide a pair of old and new '
+                      'principal IDs (user or group) and new ID separated by '
+                      'a colon per line (e.g. olduserid:newuserid).'),
         default=[],
         value_type=schema.ASCIILine(title=u"Principal Mapping Line"),
-        required=True,
+        required=False,
     )
 
     migrations = schema.List(
@@ -95,8 +111,16 @@ class UserMigrationForm(form.Form):
         self.results_properties = {}
 
     def _get_manual_mapping(self, formdata):
+        manual_mapping = formdata['manual_mapping']
+
+        if manual_mapping is None:
+                raise WidgetActionExecutionError(
+                    'manual_mapping',
+                    Invalid('Manual mapping is required if "Use manually '
+                            'entered mapping" has been selected.'))
+
         principal_mapping = {}
-        for line in formdata['manual_mapping']:
+        for line in manual_mapping:
             try:
                 old_id, new_id = line.split(':')
             except ValueError:
@@ -115,7 +139,15 @@ class UserMigrationForm(form.Form):
             self.status = self.formErrorsMessage
             return
 
-        principal_mapping = self._get_manual_mapping(data)
+        if data['mapping_source'] == USE_MANUAL_MAPPING:
+            # Parse mapping from form field
+            principal_mapping = self._get_manual_mapping(data)
+        else:
+            # Get mapping from IPrincipalMappingSource adapter
+            mapping_source = getMultiAdapter(
+                (context, context.REQUEST), IPrincipalMappingSource,
+                name=data['mapping_source'])
+            principal_mapping = mapping_source.get_mapping()
 
         if 'users' in data['migrations']:
             self.results_users = migrate_users(
@@ -152,7 +184,7 @@ class UserMigrationForm(form.Form):
 
     def updateWidgets(self):
         super(UserMigrationForm, self).updateWidgets()
-        self.widgets['principal_mapping'].rows = 15
+        self.widgets['manual_mapping'].rows = 15
         self.fields['migrations'].widgetFactory = CheckBoxFieldWidget
 
     def render(self):

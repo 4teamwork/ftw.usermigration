@@ -4,6 +4,10 @@ Changelog
 1.1 (unreleased)
 ----------------
 
+- Add support for programmatically providing principal mappings
+  by registering an IPrincipalMappingSource named adapter.
+  [lgraf]
+
 - Rename `user` to `principal` where applicable:
 
   Most of the operations work for groups as well as for users.

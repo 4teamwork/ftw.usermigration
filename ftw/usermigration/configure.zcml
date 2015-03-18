@@ -11,5 +11,10 @@
 
     <include package=".browser" />
 
+    <utility
+        provides="zope.schema.interfaces.IVocabularyFactory"
+        factory=".vocabularies.MappingSourcesVocabularyFactory"
+        name="ftw.usermigration.mapping_sources"
+        />
 
 </configure>
