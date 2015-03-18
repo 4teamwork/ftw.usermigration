@@ -4,7 +4,11 @@ Changelog
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Rename `user` to `principal` where applicable:
+
+  Most of the operations work for groups as well as for users.
+  Therefore the mapping can contain principal IDs, not just
+  user IDs.
 
 
 1.0 (2014-06-16)

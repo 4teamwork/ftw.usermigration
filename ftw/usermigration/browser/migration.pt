@@ -8,7 +8,7 @@
 <body>
 
 <metal:title fill-slot="content-title">
-    <h1 class="documentFirstHeading">User Migration Results</h1>
+    <h1 class="documentFirstHeading">User / Group Migration Results</h1>
 </metal:title>
 
 <metal:description fill-slot="content-description"></metal:description>
@@ -33,14 +33,14 @@
     </tal:block>
     </tal:users>
 
-    <tal:users repeat="mode python:view.results_properties.keys()">
+    <tal:properties repeat="mode python:view.results_properties.keys()">
     <tal:block define="rows python:view.results_properties[mode]"
                condition="rows">
-    <h2>User Properties <span tal:replace="mode" /></h2>
+    <h2>User / Group Properties <span tal:replace="mode" /></h2>
     <table class="listing">
         <tr>
-            <th>Old UserId</th>
-            <th>New UserId</th>
+            <th>Old ID</th>
+            <th>New ID</th>
         </tr>
         <tr tal:repeat="row rows">
             <td tal:content="python: row[0]" />
@@ -48,7 +48,7 @@
         </tr>
     </table>
     </tal:block>
-    </tal:users>
+    </tal:properties>
 
     <tal:localroles repeat="mode python:view.results_localroles.keys()">
     <tal:block define="rows python:view.results_localroles[mode]"
@@ -57,8 +57,8 @@
     <table class="listing">
         <tr>
             <th>Path</th>
-            <th>Old UserId</th>
-            <th>New UserId</th>
+            <th>Old ID</th>
+            <th>New ID</th>
         </tr>
         <tr tal:repeat="row rows">
             <td tal:content="python: row[0]" />
@@ -69,7 +69,7 @@
     </tal:block>
     </tal:localroles>
 
-    <tal:localroles repeat="mode python:view.results_dashboard.keys()">
+    <tal:dashboards repeat="mode python:view.results_dashboard.keys()">
     <tal:block define="rows python:view.results_dashboard[mode]"
                condition="rows">
     <h2>Dashboards <span tal:replace="mode" /></h2>
@@ -86,9 +86,9 @@
         </tr>
     </table>
     </tal:block>
-    </tal:localroles>
+    </tal:dashboards>
 
-    <tal:localroles repeat="mode python:view.results_homefolder.keys()">
+    <tal:homefolders repeat="mode python:view.results_homefolder.keys()">
     <tal:block define="rows python:view.results_homefolder[mode]"
                condition="rows">
     <h2>Homefolders <span tal:replace="mode" /></h2>
@@ -103,7 +103,7 @@
         </tr>
     </table>
     </tal:block>
-    </tal:localroles>
+    </tal:homefolders>
 
     </metal:content-core>
 </metal:content-core>

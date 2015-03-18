@@ -23,22 +23,24 @@ def migrate_localroles(context, mapping, mode='move'):
         local_roles = context.get_local_roles()
         path = '/'.join(context.getPhysicalPath())
         for role in local_roles:
-            for old_userid, new_userid in mapping.items():
-                if role[0] == old_userid:
+            for old_id, new_id in mapping.items():
+                if role[0] == old_id:
                     if mode in ['move', 'copy']:
-                        context.manage_setLocalRoles(new_userid, list(role[1]))
+                        context.manage_setLocalRoles(new_id, list(role[1]))
                         if not is_reindexing_ancestor(path):
                             reindex_paths.add(path)
                     if mode in ['move', 'delete']:
-                        context.manage_delLocalRoles(userids=[old_userid])
+                        # Even though the kw argument is named `userids`,
+                        # these are in fact principal IDs (groups or users)
+                        context.manage_delLocalRoles(userids=[old_id])
                         if not is_reindexing_ancestor(path):
                             reindex_paths.add(path)
                     if mode == 'move':
-                        moved.append((path, old_userid, new_userid))
+                        moved.append((path, old_id, new_id))
                     elif mode == 'copy':
-                        copied.append((path, old_userid, new_userid))
+                        copied.append((path, old_id, new_id))
                     elif mode == 'delete':
-                        deleted.append((path, old_userid, None))
+                        deleted.append((path, old_id, None))
 
         for obj in context.objectValues():
             migrate_and_recurse(obj)
