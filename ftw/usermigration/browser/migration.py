@@ -94,6 +94,18 @@ class UserMigrationForm(form.Form):
         self.results_users = {}
         self.results_properties = {}
 
+    def _get_manual_mapping(self, formdata):
+        principal_mapping = {}
+        for line in formdata['manual_mapping']:
+            try:
+                old_id, new_id = line.split(':')
+            except ValueError:
+                raise WidgetActionExecutionError(
+                    'manual_mapping',
+                    Invalid('Invalid principal mapping provided.'))
+            principal_mapping[old_id] = new_id
+        return principal_mapping
+
     @button.buttonAndHandler(u'Migrate')
     def handleMigrate(self, action):
         context = aq_inner(self.context)
@@ -103,39 +115,31 @@ class UserMigrationForm(form.Form):
             self.status = self.formErrorsMessage
             return
 
-        principal_ids = {}
-        for line in data['principal_mapping']:
-            try:
-                old_id, new_id = line.split(':')
-            except ValueError:
-                raise WidgetActionExecutionError(
-                    'principal_mapping',
-                    Invalid('Invalid principal mapping provided.'))
-            principal_ids[old_id] = new_id
+        principal_mapping = self._get_manual_mapping(data)
 
         if 'users' in data['migrations']:
             self.results_users = migrate_users(
-                context, principal_ids, mode=data['mode'],
+                context, principal_mapping, mode=data['mode'],
                 replace=data['replace'])
 
         if 'properties' in data['migrations']:
             self.results_properties = migrate_properties(
-                context, principal_ids, mode=data['mode'],
+                context, principal_mapping, mode=data['mode'],
                 replace=data['replace'])
 
         if 'dashboard' in data['migrations']:
             self.results_dashboard = migrate_dashboards(
-                context, principal_ids, mode=data['mode'],
+                context, principal_mapping, mode=data['mode'],
                 replace=data['replace'])
 
         if 'homefolder' in data['migrations']:
             self.results_homefolder = migrate_homefolders(
-                context, principal_ids, mode=data['mode'],
+                context, principal_mapping, mode=data['mode'],
                 replace=data['replace'])
 
         if 'localroles' in data['migrations']:
             self.results_localroles = migrate_localroles(
-                context, principal_ids, mode=data['mode'])
+                context, principal_mapping, mode=data['mode'])
 
         if data['dry_run']:
             transaction.abort()
