@@ -1,3 +1,4 @@
+from ftw.builder.testing import BUILDER_LAYER
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import PLONE_FIXTURE
@@ -7,7 +8,7 @@ from zope.configuration import xmlconfig
 
 class UserMigrationLayer(PloneSandboxLayer):
 
-    defaultBases = (PLONE_FIXTURE, )
+    defaultBases = (PLONE_FIXTURE, BUILDER_LAYER)
 
     def setUpZope(self, app, configurationContext):
         import z3c.autoinclude

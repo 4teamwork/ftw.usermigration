@@ -34,6 +34,42 @@ Usage
 
 Open ``@@user-migration`` in your browser.
 
+Registering principal mappings
+------------------------------
+
+If you would like to provide the principal mapping in a programmatic way
+instead of entering it through-the-web, you can register one or more named
+adapters that implement ``IPrincipalMappingSource``.
+
+Example:
+
+.. code:: python
+
+	class MigrationMapping(object):
+
+	    def __init__(self, portal, request):
+	        self.portal = portal
+	        self.request = request
+
+	    def get_mapping(self):
+	        mapping = {'old_user': 'new_user',
+	                   'old_group': 'new_group'}
+	        return mapping
+
+ZCML:
+
+.. code:: xml
+
+    <adapter
+        factory="my.package.migration.MigrationMapping"
+        provides="ftw.usermigration.interfaces.IPrincipalMappingSource"
+        for="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot
+             zope.publisher.interfaces.browser.IBrowserRequest"
+        name="ad-migration-2015"
+    />
+
+This will result in this mapping being selectable as a mapping source with the
+name ``ad-migration-2015`` in the ``@@user-migration`` form.
 
 Links
 =====
