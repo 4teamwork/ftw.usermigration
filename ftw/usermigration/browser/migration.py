@@ -183,9 +183,9 @@ class UserMigrationForm(form.Form):
         self.request.response.redirect(self.context.absolute_url())
 
     def updateWidgets(self):
+        self.fields['migrations'].widgetFactory = CheckBoxFieldWidget
         super(UserMigrationForm, self).updateWidgets()
         self.widgets['manual_mapping'].rows = 15
-        self.fields['migrations'].widgetFactory = CheckBoxFieldWidget
 
     def render(self):
         self.request.set('disable_border', True)
