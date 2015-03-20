@@ -4,6 +4,9 @@ Changelog
 1.1 (unreleased)
 ----------------
 
+- Make sure `Migrations` field always uses the CheckBoxFieldWidget.
+  [lgraf]
+
 - Use transaction.doom() for dry runs.
   This ensures that even an accidental commit() can't result in a DB write.
 
