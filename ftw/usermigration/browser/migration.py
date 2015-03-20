@@ -139,6 +139,9 @@ class UserMigrationForm(form.Form):
             self.status = self.formErrorsMessage
             return
 
+        if data['dry_run']:
+            transaction.doom()
+
         if data['mapping_source'] == USE_MANUAL_MAPPING:
             # Parse mapping from form field
             principal_mapping = self._get_manual_mapping(data)
@@ -172,9 +175,6 @@ class UserMigrationForm(form.Form):
         if 'localroles' in data['migrations']:
             self.results_localroles = migrate_localroles(
                 context, principal_mapping, mode=data['mode'])
-
-        if data['dry_run']:
-            transaction.abort()
 
         self.result_template = ViewPageTemplateFile('migration.pt')
 

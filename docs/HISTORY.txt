@@ -4,6 +4,9 @@ Changelog
 1.1 (unreleased)
 ----------------
 
+- Use transaction.doom() for dry runs.
+  This ensures that even an accidental commit() can't result in a DB write.
+
 - Add support for programmatically providing principal mappings
   by registering an IPrincipalMappingSource named adapter.
   [lgraf]
