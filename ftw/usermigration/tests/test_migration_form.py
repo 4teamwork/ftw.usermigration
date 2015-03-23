@@ -61,7 +61,6 @@ class TestMigrationForm(TestCase):
         setRoles(self.portal, TEST_USER_ID, ['Manager'])
 
         create(Builder('user').with_userid('old_john'))
-        transaction.commit()
 
     @browsing
     def test_form_defaults_to_using_manual_mapping(self, browser):
