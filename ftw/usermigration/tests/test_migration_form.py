@@ -68,8 +68,8 @@ class TestMigrationForm(TestCase):
 
         mapping = make_mapping({'old_john': 'new_john'})
         browser.fill(
-            {'Manual Principal Mapping': mapping}).fill(
-            {'Migrations': ['users']}
+            {'Manual Principal Mapping': mapping,
+             'Migrations': ['users']}
         ).submit()
 
         self.assertEquals(1, len(self.uf.searchUsers(id='new_john')))
@@ -108,10 +108,10 @@ class TestMigrationForm(TestCase):
 
         mapping = make_mapping({'old_john': 'new_john'})
         browser.fill(
-            {'Manual Principal Mapping': mapping}).fill(
-            {'Migrations': ['users', 'properties', 'dashboard',
-                            'homefolder', 'localroles']}).fill(
-            {'Dry Run': True}
+            {'Manual Principal Mapping': mapping,
+             'Migrations': ['users', 'properties', 'dashboard',
+                            'homefolder', 'localroles'],
+             'Dry Run': True}
         ).submit()
 
         self.assertEquals(
@@ -130,8 +130,8 @@ class TestMigrationForm(TestCase):
         browser.login().visit(view='user-migration')
 
         browser.fill(
-            {'Principal Mapping Source': 'some-migration-mapping'}).fill(
-            {'Migrations': ['users']}
+            {'Principal Mapping Source': 'some-migration-mapping',
+             'Migrations': ['users']}
         ).submit()
 
         self.assertEquals(1, len(self.uf.searchUsers(id='new_john')))
@@ -182,8 +182,8 @@ class TestMigrationForm(TestCase):
         mapping = make_mapping({'old_john': 'new_john',
                                 'old_jack': 'new_jack'})
         browser.fill(
-            {'Manual Principal Mapping': mapping}).fill(
-            {'Migrations': ['users', 'localroles']}
+            {'Manual Principal Mapping': mapping,
+             'Migrations': ['users', 'localroles']}
         ).submit()
 
         user = self.uf.searchUsers(id='new_john')[0]
@@ -204,9 +204,9 @@ class TestMigrationForm(TestCase):
         mapping = make_mapping({'old_john': 'new_john',
                                 'old_jack': 'new_jack'})
         browser.fill(
-            {'Manual Principal Mapping': mapping}).fill(
-            {'Migrations': ['users', 'localroles']}).fill(
-            {'Mode': 'copy'}
+            {'Manual Principal Mapping': mapping,
+             'Migrations': ['users', 'localroles'],
+             'Mode': 'copy'}
         ).submit()
 
         user = self.uf.searchUsers(id='new_john')[0]
