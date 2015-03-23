@@ -140,10 +140,10 @@ class UserMigrationForm(form.Form):
         manual_mapping = formdata['manual_mapping']
 
         if manual_mapping is None:
-                raise WidgetActionExecutionError(
-                    'manual_mapping',
-                    Invalid('Manual mapping is required if "Use manually '
-                            'entered mapping" has been selected.'))
+            raise WidgetActionExecutionError(
+                'manual_mapping',
+                Invalid('Manual mapping is required if "Use manually '
+                        'entered mapping" has been selected.'))
 
         principal_mapping = {}
         for line in manual_mapping:
