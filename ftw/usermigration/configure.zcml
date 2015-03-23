@@ -17,4 +17,16 @@
         name="ftw.usermigration.mapping_sources"
         />
 
+    <utility
+        provides="zope.schema.interfaces.IVocabularyFactory"
+        factory=".vocabularies.PreMigrationHooksVocabularyFactory"
+        name="ftw.usermigration.pre_migration_hooks"
+        />
+
+    <utility
+        provides="zope.schema.interfaces.IVocabularyFactory"
+        factory=".vocabularies.PostMigrationHooksVocabularyFactory"
+        name="ftw.usermigration.post_migration_hooks"
+        />
+
 </configure>

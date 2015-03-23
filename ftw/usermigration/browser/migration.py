@@ -2,6 +2,8 @@ from Acquisition import aq_inner
 from ftw.usermigration import _
 from ftw.usermigration.dashboard import migrate_dashboards
 from ftw.usermigration.homefolder import migrate_homefolders
+from ftw.usermigration.interfaces import IPostMigrationHook
+from ftw.usermigration.interfaces import IPreMigrationHook
 from ftw.usermigration.interfaces import IPrincipalMappingSource
 from ftw.usermigration.localroles import migrate_localroles
 from ftw.usermigration.properties import migrate_properties
@@ -45,6 +47,17 @@ class IUserMigrationFormSchema(interface.Interface):
         required=False,
     )
 
+    pre_migration_hooks = schema.List(
+        title=_(u'label_pre_migration_hooks', default='Pre-Migration Hooks'),
+        description=_(u'pre_migration_hooks',
+                      default=u'Check any pre-migration hooks that should be '
+                      'executed before the migration.'),
+        value_type=schema.Choice(
+            vocabulary='ftw.usermigration.pre_migration_hooks',
+        ),
+        required=False,
+    )
+
     migrations = schema.List(
         title=_(u'label_migrations', default=u'Migrations'),
         description=_(u'help_migrations', default=u'Select one or more '
@@ -59,6 +72,17 @@ class IUserMigrationFormSchema(interface.Interface):
             ]),
         ),
         required=True,
+    )
+
+    post_migration_hooks = schema.List(
+        title=_(u'label_post_migration_hooks', default='Post-Migration Hooks'),
+        description=_(u'post_migration_hooks',
+                      default=u'Check any post-migration hooks that should be '
+                      'executed after the migration.'),
+        value_type=schema.Choice(
+            vocabulary='ftw.usermigration.post_migration_hooks',
+        ),
+        required=False,
     )
 
     mode = schema.Choice(
@@ -104,11 +128,13 @@ class UserMigrationForm(form.Form):
     def __init__(self, context, request):
         super(UserMigrationForm, self).__init__(context, request)
         self.result_template = None
+        self.results_pre_migration = {}
         self.results_localroles = {}
         self.results_dashboard = {}
         self.results_homefolder = {}
         self.results_users = {}
         self.results_properties = {}
+        self.results_post_migration = {}
 
     def _get_manual_mapping(self, formdata):
         manual_mapping = formdata['manual_mapping']
@@ -129,6 +155,12 @@ class UserMigrationForm(form.Form):
                     Invalid('Invalid principal mapping provided.'))
             principal_mapping[old_id] = new_id
         return principal_mapping
+
+    def _get_hooks(self, hooks, interface):
+        for name in hooks:
+            hook = getMultiAdapter(
+                (self.context, self.context.REQUEST), interface, name)
+            yield name, hook
 
     @button.buttonAndHandler(u'Migrate')
     def handleMigrate(self, action):
@@ -151,6 +183,13 @@ class UserMigrationForm(form.Form):
                 (context, context.REQUEST), IPrincipalMappingSource,
                 name=data['mapping_source'])
             principal_mapping = mapping_source.get_mapping()
+
+        pre_migration_hooks = self._get_hooks(
+            data['pre_migration_hooks'], IPreMigrationHook)
+
+        for name, hook in pre_migration_hooks:
+            hook_results = hook.execute(principal_mapping, data['mode'])
+            self.results_pre_migration[name] = hook_results
 
         if 'users' in data['migrations']:
             self.results_users = migrate_users(
@@ -176,6 +215,13 @@ class UserMigrationForm(form.Form):
             self.results_localroles = migrate_localroles(
                 context, principal_mapping, mode=data['mode'])
 
+        post_migration_hooks = self._get_hooks(
+            data['post_migration_hooks'], IPostMigrationHook)
+
+        for name, hook in post_migration_hooks:
+            hook_results = hook.execute(principal_mapping, data['mode'])
+            self.results_post_migration[name] = hook_results
+
         self.result_template = ViewPageTemplateFile('migration.pt')
 
     @button.buttonAndHandler((u"Cancel"))
@@ -183,7 +229,9 @@ class UserMigrationForm(form.Form):
         self.request.response.redirect(self.context.absolute_url())
 
     def updateWidgets(self):
+        self.fields['pre_migration_hooks'].widgetFactory = CheckBoxFieldWidget
         self.fields['migrations'].widgetFactory = CheckBoxFieldWidget
+        self.fields['post_migration_hooks'].widgetFactory = CheckBoxFieldWidget
         super(UserMigrationForm, self).updateWidgets()
         self.widgets['manual_mapping'].rows = 15
 

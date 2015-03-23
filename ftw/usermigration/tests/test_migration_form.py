@@ -2,6 +2,8 @@ from ftw.builder import Builder
 from ftw.builder import create
 from ftw.testbrowser import browsing
 from ftw.testbrowser.pages.z3cform import erroneous_fields
+from ftw.usermigration.interfaces import IPostMigrationHook
+from ftw.usermigration.interfaces import IPreMigrationHook
 from ftw.usermigration.interfaces import IPrincipalMappingSource
 from ftw.usermigration.testing import USERMIGRATION_FUNCTIONAL_TESTING
 from plone.app.testing import setRoles
@@ -27,6 +29,26 @@ class DummyMigrationMappingSource(object):
 
     def get_mapping(self):
         return {'old_john': 'new_john'}
+
+
+class DummyMigrationHook(object):
+
+    def __init__(self, portal, request):
+        self.portal = portal
+        self.request = request
+
+    def execute(self, principal_mapping, mode):
+        results = {
+            'Step 1': {
+                'moved': [('/foo', 'old', 'new')],
+                'copied': [],
+                'deleted': []},
+            'Step 2': {
+                'moved': [('/bar', 'old', 'new')],
+                'copied': [],
+                'deleted': []},
+        }
+        return results
 
 
 class TestMigrationForm(TestCase):
@@ -114,6 +136,45 @@ class TestMigrationForm(TestCase):
         ).submit()
 
         self.assertEquals(1, len(self.uf.searchUsers(id='new_john')))
+
+    @browsing
+    def test_can_use_pre_and_post_migration_hooks(self, browser):
+        gsm = getGlobalSiteManager()
+        gsm.registerAdapter(
+            DummyMigrationHook, (IPloneSiteRoot, IBrowserRequest),
+            IPreMigrationHook, name='dummy-pre-migration-hook')
+        gsm.registerAdapter(
+            DummyMigrationHook, (IPloneSiteRoot, IBrowserRequest),
+            IPostMigrationHook, name='dummy-post-migration-hook')
+
+        browser.login().visit(view='user-migration')
+
+        mapping = make_mapping({'old_john': 'new_john'})
+        browser.fill(
+            {'Manual Principal Mapping': mapping,
+             'Pre-Migration Hooks': ['dummy-pre-migration-hook'],
+             'Post-Migration Hooks': ['dummy-post-migration-hook']}
+        ).submit()
+
+        self.assertEquals(
+            [['Object', 'Old ID', 'New ID'],
+             ['/foo', 'old', 'new']],
+            browser.css('table.pre-migration-hook')[0].lists())
+
+        self.assertEquals(
+            [['Object', 'Old ID', 'New ID'],
+             ['/bar', 'old', 'new']],
+            browser.css('table.pre-migration-hook')[1].lists())
+
+        self.assertEquals(
+            [['Object', 'Old ID', 'New ID'],
+             ['/foo', 'old', 'new']],
+            browser.css('table.post-migration-hook')[0].lists())
+
+        self.assertEquals(
+            [['Object', 'Old ID', 'New ID'],
+             ['/bar', 'old', 'new']],
+            browser.css('table.post-migration-hook')[1].lists())
 
     @browsing
     def test_form_user_move(self, browser):
