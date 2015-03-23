@@ -11,7 +11,6 @@ from plone.app.testing import TEST_USER_ID
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.interfaces.siteroot import IPloneSiteRoot
 from unittest2 import TestCase
-from zope.component import getGlobalSiteManager
 from zope.publisher.interfaces.browser import IBrowserRequest
 import transaction
 
@@ -57,8 +56,9 @@ class TestMigrationForm(TestCase):
 
     def setUp(self):
         self.portal = self.layer['portal']
-        setRoles(self.portal, TEST_USER_ID, ['Manager'])
+        self.sm = self.portal.getSiteManager()
         self.uf = getToolByName(self.portal, 'acl_users')
+        setRoles(self.portal, TEST_USER_ID, ['Manager'])
 
         create(Builder('user').with_userid('old_john'))
         transaction.commit()
@@ -123,10 +123,10 @@ class TestMigrationForm(TestCase):
 
     @browsing
     def test_can_use_mapping_source_adapters(self, browser):
-        gsm = getGlobalSiteManager()
-        gsm.registerAdapter(
+        self.sm.registerAdapter(
             DummyMigrationMappingSource, (IPloneSiteRoot, IBrowserRequest),
             IPrincipalMappingSource, name='some-migration-mapping')
+        transaction.commit()
 
         browser.login().visit(view='user-migration')
 
@@ -139,13 +139,13 @@ class TestMigrationForm(TestCase):
 
     @browsing
     def test_can_use_pre_and_post_migration_hooks(self, browser):
-        gsm = getGlobalSiteManager()
-        gsm.registerAdapter(
+        self.sm.registerAdapter(
             DummyMigrationHook, (IPloneSiteRoot, IBrowserRequest),
             IPreMigrationHook, name='dummy-pre-migration-hook')
-        gsm.registerAdapter(
+        self.sm.registerAdapter(
             DummyMigrationHook, (IPloneSiteRoot, IBrowserRequest),
             IPostMigrationHook, name='dummy-post-migration-hook')
+        transaction.commit()
 
         browser.login().visit(view='user-migration')
 
