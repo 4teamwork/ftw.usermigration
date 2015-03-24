@@ -4,6 +4,9 @@ Changelog
 1.1 (unreleased)
 ----------------
 
+- Add support for pre- and post-migration hooks.
+  [lgraf]
+
 - Make sure `Migrations` field always uses the CheckBoxFieldWidget.
   [lgraf]
 

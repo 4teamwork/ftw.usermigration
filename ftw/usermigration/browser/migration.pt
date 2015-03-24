@@ -16,6 +16,37 @@
 <metal:content-core fill-slot="content-core">
     <metal:content-core define-macro="content-core">
 
+
+    <tal:pre-migration-hooks define="results_pre_migration view/results_pre_migration"
+                             repeat="hook_name python:results_pre_migration.keys()"
+                             condition="view/results_pre_migration">
+    <h2>Pre-Migration Hooks</h2>
+    <h3 tal:content="hook_name" />
+    <tal:hook_results define="hook_results python:results_pre_migration[hook_name]"
+                      repeat="step_name python:hook_results.keys()">
+    <tal:step_results define="step_results python:hook_results[step_name]"
+                      repeat="mode python:step_results.keys()">
+    <tal:block define="rows python:hook_results[step_name][mode]"
+               condition="rows">
+    <h4 tal:content="string: ${hook_name}: ${step_name} ${mode}" />
+    <table class="listing pre-migration-hook">
+        <tr>
+            <th>Object</th>
+            <th>Old ID</th>
+            <th>New ID</th>
+        </tr>
+        <tr tal:repeat="row rows">
+            <td tal:content="python: row[0]" />
+            <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
+        </tr>
+    </table>
+    </tal:block>
+    </tal:step_results>
+    </tal:hook_results>
+    </tal:pre-migration-hooks>
+
+
     <tal:users repeat="mode python:view.results_users.keys()">
     <tal:block define="rows python:view.results_users[mode]"
                condition="rows">
@@ -33,6 +64,7 @@
     </tal:block>
     </tal:users>
 
+
     <tal:properties repeat="mode python:view.results_properties.keys()">
     <tal:block define="rows python:view.results_properties[mode]"
                condition="rows">
@@ -49,6 +81,7 @@
     </table>
     </tal:block>
     </tal:properties>
+
 
     <tal:localroles repeat="mode python:view.results_localroles.keys()">
     <tal:block define="rows python:view.results_localroles[mode]"
@@ -69,6 +102,7 @@
     </tal:block>
     </tal:localroles>
 
+
     <tal:dashboards repeat="mode python:view.results_dashboard.keys()">
     <tal:block define="rows python:view.results_dashboard[mode]"
                condition="rows">
@@ -88,6 +122,7 @@
     </tal:block>
     </tal:dashboards>
 
+
     <tal:homefolders repeat="mode python:view.results_homefolder.keys()">
     <tal:block define="rows python:view.results_homefolder[mode]"
                condition="rows">
@@ -104,6 +139,37 @@
     </table>
     </tal:block>
     </tal:homefolders>
+
+
+    <tal:post-migration-hooks define="results_post_migration view/results_post_migration"
+                             repeat="hook_name python:results_post_migration.keys()"
+                             condition="view/results_post_migration">
+    <h2>Post-Migration Hooks</h2>
+    <h3 tal:content="hook_name" />
+    <tal:hook_results define="hook_results python:results_post_migration[hook_name]"
+                      repeat="step_name python:hook_results.keys()">
+    <tal:step_results define="step_results python:hook_results[step_name]"
+                      repeat="mode python:step_results.keys()">
+    <tal:block define="rows python:hook_results[step_name][mode]"
+               condition="rows">
+    <h4 tal:content="string: ${hook_name}: ${step_name} ${mode}" />
+    <table class="listing post-migration-hook">
+        <tr>
+            <th>Object</th>
+            <th>Old ID</th>
+            <th>New ID</th>
+        </tr>
+        <tr tal:repeat="row rows">
+            <td tal:content="python: row[0]" />
+            <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
+        </tr>
+    </table>
+    </tal:block>
+    </tal:step_results>
+    </tal:hook_results>
+    </tal:post-migration-hooks>
+
 
     </metal:content-core>
 </metal:content-core>

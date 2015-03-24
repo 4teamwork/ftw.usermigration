@@ -1,3 +1,5 @@
+from ftw.usermigration.interfaces import IPostMigrationHook
+from ftw.usermigration.interfaces import IPreMigrationHook
 from ftw.usermigration.interfaces import IPrincipalMappingSource
 from zope.component import getAdapters
 from zope.schema.vocabulary import SimpleVocabulary
@@ -20,6 +22,36 @@ class MappingSourcesVocabularyFactory(object):
             (context, context.REQUEST), IPrincipalMappingSource)
 
         for name, src in mapping_sources:
+            value, token, title = name, name, name
+            terms.append(SimpleVocabulary.createTerm(value, token, title))
+
+        return SimpleVocabulary(terms)
+
+
+class PreMigrationHooksVocabularyFactory(object):
+
+    def __call__(self, context):
+        terms = []
+
+        hooks = getAdapters(
+            (context, context.REQUEST), IPreMigrationHook)
+
+        for name, hook in hooks:
+            value, token, title = name, name, name
+            terms.append(SimpleVocabulary.createTerm(value, token, title))
+
+        return SimpleVocabulary(terms)
+
+
+class PostMigrationHooksVocabularyFactory(object):
+
+    def __call__(self, context):
+        terms = []
+
+        hooks = getAdapters(
+            (context, context.REQUEST), IPostMigrationHook)
+
+        for name, hook in hooks:
             value, token, title = name, name, name
             terms.append(SimpleVocabulary.createTerm(value, token, title))
 
