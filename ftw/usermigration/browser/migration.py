@@ -1,6 +1,7 @@
 from Acquisition import aq_inner
 from ftw.usermigration import _
 from ftw.usermigration.dashboard import migrate_dashboards
+from ftw.usermigration.globalroles import migrate_globalroles
 from ftw.usermigration.homefolder import migrate_homefolders
 from ftw.usermigration.interfaces import IPostMigrationHook
 from ftw.usermigration.interfaces import IPreMigrationHook
@@ -66,6 +67,7 @@ class IUserMigrationFormSchema(interface.Interface):
             vocabulary=SimpleVocabulary([
                 SimpleTerm('users', 'users', _(u'Users')),
                 SimpleTerm('localroles', 'localroles', _(u'Local Roles')),
+                SimpleTerm('globalroles', 'globalroles', _(u'Global Roles')),
                 SimpleTerm('dashboard', 'dashboard', _(u"Dashboard")),
                 SimpleTerm('homefolder', 'homefolder', _(u"Home Folder")),
                 SimpleTerm('properties', 'properties', _(u"User Properties")),
@@ -130,6 +132,7 @@ class UserMigrationForm(form.Form):
         self.result_template = None
         self.results_pre_migration = {}
         self.results_localroles = {}
+        self.results_globalroles = {}
         self.results_dashboard = {}
         self.results_homefolder = {}
         self.results_users = {}
@@ -213,6 +216,10 @@ class UserMigrationForm(form.Form):
 
         if 'localroles' in data['migrations']:
             self.results_localroles = migrate_localroles(
+                context, principal_mapping, mode=data['mode'])
+
+        if 'globalroles' in data['migrations']:
+            self.results_globalroles = migrate_globalroles(
                 context, principal_mapping, mode=data['mode'])
 
         post_migration_hooks = self._get_hooks(
