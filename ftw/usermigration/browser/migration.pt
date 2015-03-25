@@ -103,6 +103,26 @@
     </tal:localroles>
 
 
+    <tal:globalroles repeat="mode python:view.results_globalroles.keys()">
+    <tal:block define="rows python:view.results_globalroles[mode]"
+               condition="rows">
+    <h2>Global roles <span tal:replace="mode" /></h2>
+    <table class="listing">
+        <tr>
+            <th>Role</th>
+            <th>Old ID</th>
+            <th>New ID</th>
+        </tr>
+        <tr tal:repeat="row rows">
+            <td tal:content="python: row[0]" />
+            <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
+        </tr>
+    </table>
+    </tal:block>
+    </tal:globalroles>
+
+
     <tal:dashboards repeat="mode python:view.results_dashboard.keys()">
     <tal:block define="rows python:view.results_dashboard[mode]"
                condition="rows">

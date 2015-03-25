@@ -4,6 +4,9 @@ Changelog
 1.1 (unreleased)
 ----------------
 
+- Add migration for global roles (portal_role_manager).
+  [lgraf]
+
 - Add support for pre- and post-migration hooks.
   [lgraf]
 
