@@ -25,7 +25,7 @@ class TestUsers(TestCase):
         mapping = {'user1': 'john.doe'}
         results = migrate_users(portal, mapping)
 
-        self.assertIn(('user1', 'john.doe'), results['moved'])
+        self.assertIn(('acl_users', 'user1', 'john.doe'), results['moved'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['deleted'])
 
@@ -61,7 +61,7 @@ class TestUsers(TestCase):
         portal = self.layer['portal']
         mapping = {'user1': 'jack'}
         results = migrate_users(portal, mapping, replace=True)
-        self.assertIn(('user1', 'jack'), results['moved'])
+        self.assertIn(('acl_users', 'user1', 'jack'), results['moved'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['deleted'])
 
@@ -80,7 +80,7 @@ class TestUsers(TestCase):
         mapping = {'user1': 'john.doe'}
         results = migrate_users(portal, mapping, mode='copy')
 
-        self.assertIn(('user1', 'john.doe'), results['copied'])
+        self.assertIn(('acl_users', 'user1', 'john.doe'), results['copied'])
         self.assertEquals([], results['moved'])
         self.assertEquals([], results['deleted'])
 
@@ -103,7 +103,7 @@ class TestUsers(TestCase):
         mapping = {'user1': 'john.doe'}
         results = migrate_users(portal, mapping, mode='delete')
 
-        self.assertIn(('user1', None), results['deleted'])
+        self.assertIn(('acl_users', 'user1', None), results['deleted'])
         self.assertEquals([], results['moved'])
         self.assertEquals([], results['copied'])
 

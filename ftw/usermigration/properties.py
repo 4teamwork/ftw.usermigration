@@ -32,10 +32,10 @@ def migrate_properties(context, mapping, mode='move', replace=False):
             plugin.deleteUser(old_id)
 
         if mode == 'move':
-            moved.append((old_id, new_id))
+            moved.append(('mutable_properties', old_id, new_id))
         if mode == 'copy':
-            copied.append((old_id, new_id))
+            copied.append(('mutable_properties', old_id, new_id))
         if mode == 'delete':
-            deleted.append((old_id, None))
+            deleted.append(('mutable_properties', old_id, None))
 
     return(dict(moved=moved, copied=copied, deleted=deleted))

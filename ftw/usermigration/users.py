@@ -45,10 +45,10 @@ def migrate_users(context, mapping, mode='move', replace=False):
                         plugin._userid_to_login[new_userid] = login
 
                     if mode == 'move':
-                        moved.append((old_userid, new_userid))
+                        moved.append(('acl_users', old_userid, new_userid))
                     if mode == 'copy':
-                        copied.append((old_userid, new_userid))
+                        copied.append(('acl_users', old_userid, new_userid))
                     if mode == 'delete':
-                        deleted.append((old_userid, None))
+                        deleted.append(('acl_users', old_userid, None))
 
     return(dict(moved=moved, copied=copied, deleted=deleted))

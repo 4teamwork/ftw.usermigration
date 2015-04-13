@@ -57,8 +57,8 @@
             <th>New UserId</th>
         </tr>
         <tr tal:repeat="row rows">
-            <td tal:content="python: row[0]" />
             <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
         </tr>
     </table>
     </tal:block>
@@ -75,8 +75,8 @@
             <th>New ID</th>
         </tr>
         <tr tal:repeat="row rows">
-            <td tal:content="python: row[0]" />
             <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
         </tr>
     </table>
     </tal:block>
@@ -153,8 +153,8 @@
             <th>New UserId</th>
         </tr>
         <tr tal:repeat="row rows">
-            <td tal:content="python: row[0]" />
             <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
         </tr>
     </table>
     </tal:block>

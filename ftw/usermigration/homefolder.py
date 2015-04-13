@@ -35,7 +35,7 @@ def migrate_homefolders(context, mapping, mode='move', replace=False):
         if mode == 'move':
             container.manage_renameObject(old_home_id, new_home_id)
             new_home = container[new_home_id]
-            moved.append((old_userid, new_userid))
+            moved.append(('homefolder', old_userid, new_userid))
 
         # Copy home folder
         elif mode == 'copy':
@@ -43,12 +43,12 @@ def migrate_homefolders(context, mapping, mode='move', replace=False):
                 cb_copy_data=container.manage_copyObjects(ids=[old_home_id]))
             container.manage_renameObject(new_ids[0]['new_id'], new_home_id)
             new_home = container[new_home_id]
-            copied.append((old_userid, new_userid))
+            copied.append(('homefolder', old_userid, new_userid))
 
         # Delete home folder
         elif mode == 'delete':
             container.manage_delObjects(ids=[old_home_id])
-            deleted.append((old_userid, None))
+            deleted.append(('homefolder', old_userid, None))
 
         # Assing local roles
         if new_home is not None:

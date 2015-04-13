@@ -28,7 +28,8 @@ class TestProperties(TestCase):
         mapping = {'john': 'peter'}
         results = migrate_properties(portal, mapping)
 
-        self.assertIn(('john', 'peter'), results['moved'])
+        self.assertIn(('mutable_properties', 'john', 'peter'),
+                      results['moved'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['deleted'])
 
@@ -43,7 +44,8 @@ class TestProperties(TestCase):
         mapping = {'john': 'jack'}
         results = migrate_properties(portal, mapping, replace=True)
 
-        self.assertIn(('john', 'jack'), results['moved'])
+        self.assertIn(('mutable_properties', 'john', 'jack'),
+                      results['moved'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['deleted'])
 
@@ -67,7 +69,8 @@ class TestProperties(TestCase):
         mapping = {'john': 'peter'}
         results = migrate_properties(portal, mapping, mode='copy')
 
-        self.assertIn(('john', 'peter'), results['copied'])
+        self.assertIn(('mutable_properties', 'john', 'peter'),
+                      results['copied'])
         self.assertEquals([], results['moved'])
         self.assertEquals([], results['deleted'])
 
@@ -82,7 +85,7 @@ class TestProperties(TestCase):
         mapping = {'john': 'peter'}
         results = migrate_properties(portal, mapping, mode='delete')
 
-        self.assertIn(('john', None), results['deleted'])
+        self.assertIn(('mutable_properties', 'john', None), results['deleted'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['moved'])
 

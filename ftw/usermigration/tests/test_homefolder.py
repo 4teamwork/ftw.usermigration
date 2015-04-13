@@ -46,7 +46,7 @@ class HomefolderMigrationTest(TestCase):
         self.assertNotIn('john', members_folder.objectIds())
         self.assertIn('peter', members_folder.objectIds())
 
-        self.assertIn(('john', 'peter'), results['moved'])
+        self.assertIn(('homefolder', 'john', 'peter'), results['moved'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['deleted'])
 
@@ -87,7 +87,7 @@ class HomefolderMigrationTest(TestCase):
         self.assertIn('john', self.folder.objectIds())
         self.assertIn('peter', self.folder.objectIds())
 
-        self.assertIn(('john', 'peter'), results['copied'])
+        self.assertIn(('homefolder', 'john', 'peter'), results['copied'])
         self.assertEquals([], results['moved'])
         self.assertEquals([], results['deleted'])
 
@@ -99,7 +99,7 @@ class HomefolderMigrationTest(TestCase):
         self.assertNotIn('john', self.folder.objectIds())
         self.assertNotIn('peter', self.folder.objectIds())
 
-        self.assertIn(('john', None), results['deleted'])
+        self.assertIn(('homefolder', 'john', None), results['deleted'])
         self.assertEquals([], results['moved'])
         self.assertEquals([], results['copied'])
 
@@ -112,6 +112,7 @@ class HomefolderMigrationTest(TestCase):
         self.assertEquals(None, mtool.getHomeFolder(id='john@domain.net'))
         self.assertNotEquals(None, mtool.getHomeFolder(id='peter@domain.net'))
 
-        self.assertIn(('john@domain.net', 'peter@domain.net'), results['moved'])
+        self.assertIn(('homefolder', 'john@domain.net', 'peter@domain.net'),
+                      results['moved'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['deleted'])
