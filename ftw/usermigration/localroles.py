@@ -1,4 +1,4 @@
-def migrate_localroles(context, mapping, mode='move'):
+def migrate_localroles(context, mapping, mode='move', replace=False):
     """Recursively migrate local roles on the given context."""
 
     # Statistics
@@ -8,6 +8,10 @@ def migrate_localroles(context, mapping, mode='move'):
 
     # Paths needing reindexing of security
     reindex_paths = set()
+
+    if replace:
+        raise NotImplementedError(
+            "Local roles migration only supports 'replace=False' as of yet")
 
     def is_reindexing_ancestor(path):
         """Determine if an ancestor of the given path is already in

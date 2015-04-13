@@ -1,4 +1,6 @@
 from Acquisition import aq_inner
+from collections import defaultdict
+from datetime import datetime
 from ftw.usermigration import _
 from ftw.usermigration.dashboard import migrate_dashboards
 from ftw.usermigration.globalroles import migrate_globalroles
@@ -9,7 +11,12 @@ from ftw.usermigration.interfaces import IPrincipalMappingSource
 from ftw.usermigration.localroles import migrate_localroles
 from ftw.usermigration.properties import migrate_properties
 from ftw.usermigration.users import migrate_users
+from ftw.usermigration.utils import get_var_log
+from ftw.usermigration.utils import mkdir_p
 from ftw.usermigration.vocabularies import USE_MANUAL_MAPPING
+from logging import FileHandler
+from logging import getLogger
+from pprint import pformat
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from z3c.form import form, field, button
 from z3c.form.browser.checkbox import CheckBoxFieldWidget
@@ -19,7 +26,19 @@ from zope.component import getMultiAdapter
 from zope.interface import Invalid
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
+import logging
+import os
 import transaction
+
+
+BUILTIN_MIGRATIONS = {
+    'users': migrate_users,
+    'properties': migrate_properties,
+    'dashboard': migrate_dashboards,
+    'homefolder': migrate_homefolders,
+    'localroles': migrate_localroles,
+    'globalroles': migrate_globalroles,
+}
 
 
 class IUserMigrationFormSchema(interface.Interface):
@@ -113,6 +132,14 @@ class IUserMigrationFormSchema(interface.Interface):
         default=False,
     )
 
+    log_to_file = schema.Bool(
+        title=_(u'label_log_to_file', default=u'Log migration report to file'),
+        default=False,
+        description=_(u'help_log_to_file',
+                      default=u'Whether a detailed migration report should be'
+                      ' written to a logfile on the filesystem.'),
+    )
+
     dry_run = schema.Bool(
         title=_(u'label_dry_run', default=u'Dry Run'),
         default=False,
@@ -131,13 +158,9 @@ class UserMigrationForm(form.Form):
         super(UserMigrationForm, self).__init__(context, request)
         self.result_template = None
         self.results_pre_migration = {}
-        self.results_localroles = {}
-        self.results_globalroles = {}
-        self.results_dashboard = {}
-        self.results_homefolder = {}
-        self.results_users = {}
-        self.results_properties = {}
+        self.results = defaultdict(dict)
         self.results_post_migration = {}
+        self.log_to_file = False
 
     def _get_manual_mapping(self, formdata):
         manual_mapping = formdata['manual_mapping']
@@ -165,6 +188,40 @@ class UserMigrationForm(form.Form):
                 (self.context, self.context.REQUEST), interface, name)
             yield name, hook
 
+    def _setup_logger(self):
+        logger = getLogger('ftw.usermigration')
+        logger.setLevel(logging.DEBUG)
+
+        # Remove any existing handlers. Required because this may be called
+        # multiple times, and we also want a new timestamp for every run
+        for h in logger.handlers:
+            logger.removeHandler(h)
+
+        log_path = None
+        if self.log_to_file:
+            timestamp = datetime.today().strftime('%Y%m%d%H%M')
+            log_fn = 'usermigration-{0}.log'.format(timestamp)
+            log_dir = get_var_log()
+            mkdir_p(log_dir)
+            log_path = os.path.join(log_dir, log_fn)
+
+            handler = FileHandler(log_path)
+            handler.setFormatter(logging.Formatter(
+                "%(asctime)-15s %(message)s", "%Y-%m-%d %H:%M"))
+            handler.setLevel(logging.DEBUG)
+            logger.addHandler(handler)
+
+        return logger, log_path
+
+    def _log_migration_details(self, logger, name, results):
+        if not self.log_to_file:
+            return
+
+        for mode in results.keys():
+            for obj, old, new in results[mode]:
+                logger.debug("Migrated [{0}] {1}: {2} -> {3}".format(
+                    name, obj, old, new))
+
     @button.buttonAndHandler(u'Migrate')
     def handleMigrate(self, action):
         context = aq_inner(self.context)
@@ -174,8 +231,13 @@ class UserMigrationForm(form.Form):
             self.status = self.formErrorsMessage
             return
 
+        self.log_to_file = data['log_to_file']
+        logger, logfile_path = self._setup_logger()
+        logger.info('Starting principal migration')
+
         if data['dry_run']:
             transaction.doom()
+            logger.info('(Dry run)')
 
         if data['mapping_source'] == USE_MANUAL_MAPPING:
             # Parse mapping from form field
@@ -186,48 +248,45 @@ class UserMigrationForm(form.Form):
                 (context, context.REQUEST), IPrincipalMappingSource,
                 name=data['mapping_source'])
             principal_mapping = mapping_source.get_mapping()
+        logger.debug('Using mapping:\n{0}'.format(pformat(principal_mapping)))
 
+        # Pre-migration hooks
         pre_migration_hooks = self._get_hooks(
             data['pre_migration_hooks'], IPreMigrationHook)
 
         for name, hook in pre_migration_hooks:
+            logger.info("Starting migration '{0}'".format(name))
             hook_results = hook.execute(principal_mapping, data['mode'])
             self.results_pre_migration[name] = hook_results
+            for section in hook_results.keys():
+                self._log_migration_details(
+                    logger, section, hook_results[section])
 
-        if 'users' in data['migrations']:
-            self.results_users = migrate_users(
-                context, principal_mapping, mode=data['mode'],
-                replace=data['replace'])
+        # Builtin migrations
+        for name, migration in BUILTIN_MIGRATIONS.items():
+            if name in data['migrations']:
+                logger.info("Starting migration '{0}'".format(name))
+                self.results[name] = migration(
+                    context, principal_mapping, mode=data['mode'],
+                    replace=data['replace'])
+                self._log_migration_details(logger, name, self.results[name])
 
-        if 'properties' in data['migrations']:
-            self.results_properties = migrate_properties(
-                context, principal_mapping, mode=data['mode'],
-                replace=data['replace'])
-
-        if 'dashboard' in data['migrations']:
-            self.results_dashboard = migrate_dashboards(
-                context, principal_mapping, mode=data['mode'],
-                replace=data['replace'])
-
-        if 'homefolder' in data['migrations']:
-            self.results_homefolder = migrate_homefolders(
-                context, principal_mapping, mode=data['mode'],
-                replace=data['replace'])
-
-        if 'localroles' in data['migrations']:
-            self.results_localroles = migrate_localroles(
-                context, principal_mapping, mode=data['mode'])
-
-        if 'globalroles' in data['migrations']:
-            self.results_globalroles = migrate_globalroles(
-                context, principal_mapping, mode=data['mode'])
-
+        # Post-migration hooks
         post_migration_hooks = self._get_hooks(
             data['post_migration_hooks'], IPostMigrationHook)
 
         for name, hook in post_migration_hooks:
+            logger.info("Starting migration '{0}'".format(name))
             hook_results = hook.execute(principal_mapping, data['mode'])
             self.results_post_migration[name] = hook_results
+            for section in hook_results.keys():
+                self._log_migration_details(
+                    logger, section, hook_results[section])
+
+        logger.info("Migration finished")
+        if self.log_to_file:
+            logger.info("Migration logfile written to {0}".format(
+                logfile_path))
 
         self.result_template = ViewPageTemplateFile('migration.pt')
 
