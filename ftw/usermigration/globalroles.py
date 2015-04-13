@@ -2,7 +2,7 @@ from operator import itemgetter
 from Products.CMFCore.utils import getToolByName
 
 
-def migrate_globalroles(context, mapping, mode='move'):
+def migrate_globalroles(context, mapping, mode='move', replace=False):
     """Migrate global roles in portal_role_manager."""
 
     # Statistics
@@ -11,6 +11,10 @@ def migrate_globalroles(context, mapping, mode='move'):
     if mode != 'move':
         raise NotImplementedError(
             "Global roles migration only supports 'move' mode as of yet")
+
+    if replace:
+        raise NotImplementedError(
+            "Global roles migration only supports 'replace=False' as of yet")
 
     acl_users = getToolByName(context, 'acl_users')
     role_manager = acl_users.portal_role_manager

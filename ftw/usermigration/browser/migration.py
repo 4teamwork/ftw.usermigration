@@ -1,4 +1,5 @@
 from Acquisition import aq_inner
+from collections import defaultdict
 from datetime import datetime
 from ftw.usermigration import _
 from ftw.usermigration.dashboard import migrate_dashboards
@@ -28,6 +29,16 @@ from zope.schema.vocabulary import SimpleVocabulary
 import logging
 import os
 import transaction
+
+
+BUILTIN_MIGRATIONS = {
+    'users': migrate_users,
+    'properties': migrate_properties,
+    'dashboard': migrate_dashboards,
+    'homefolder': migrate_homefolders,
+    'localroles': migrate_localroles,
+    'globalroles': migrate_globalroles,
+}
 
 
 class IUserMigrationFormSchema(interface.Interface):
@@ -147,12 +158,7 @@ class UserMigrationForm(form.Form):
         super(UserMigrationForm, self).__init__(context, request)
         self.result_template = None
         self.results_pre_migration = {}
-        self.results_localroles = {}
-        self.results_globalroles = {}
-        self.results_dashboard = {}
-        self.results_homefolder = {}
-        self.results_users = {}
-        self.results_properties = {}
+        self.results = defaultdict(dict)
         self.results_post_migration = {}
         self.log_to_file = False
 
@@ -244,6 +250,7 @@ class UserMigrationForm(form.Form):
             principal_mapping = mapping_source.get_mapping()
         logger.debug('Using mapping:\n{0}'.format(pformat(principal_mapping)))
 
+        # Pre-migration hooks
         pre_migration_hooks = self._get_hooks(
             data['pre_migration_hooks'], IPreMigrationHook)
 
@@ -252,48 +259,19 @@ class UserMigrationForm(form.Form):
             hook_results = hook.execute(principal_mapping, data['mode'])
             self.results_pre_migration[name] = hook_results
             for section in hook_results.keys():
-                self._log_migration_details(logger, section, hook_results[section])
+                self._log_migration_details(
+                    logger, section, hook_results[section])
 
-        if 'users' in data['migrations']:
-            logger.info("Starting migration 'users'")
-            self.results_users = migrate_users(
-                context, principal_mapping, mode=data['mode'],
-                replace=data['replace'])
-            self._log_migration_details(logger, 'users', self.results_users)
+        # Builtin migrations
+        for name, migration in BUILTIN_MIGRATIONS.items():
+            if name in data['migrations']:
+                logger.info("Starting migration '{0}'".format(name))
+                self.results[name] = migration(
+                    context, principal_mapping, mode=data['mode'],
+                    replace=data['replace'])
+                self._log_migration_details(logger, name, self.results[name])
 
-        if 'properties' in data['migrations']:
-            logger.info("Starting migration 'properties'")
-            self.results_properties = migrate_properties(
-                context, principal_mapping, mode=data['mode'],
-                replace=data['replace'])
-            self._log_migration_details(logger, 'properties', self.results_properties)
-
-        if 'dashboard' in data['migrations']:
-            logger.info("Starting migration 'dashboard'")
-            self.results_dashboard = migrate_dashboards(
-                context, principal_mapping, mode=data['mode'],
-                replace=data['replace'])
-            self._log_migration_details(logger, 'dashboard', self.results_dashboard)
-
-        if 'homefolder' in data['migrations']:
-            logger.info("Starting migration 'homefolder'")
-            self.results_homefolder = migrate_homefolders(
-                context, principal_mapping, mode=data['mode'],
-                replace=data['replace'])
-            self._log_migration_details(logger, 'homefolder', self.results_homefolder)
-
-        if 'localroles' in data['migrations']:
-            logger.info("Starting migration 'localroles'")
-            self.results_localroles = migrate_localroles(
-                context, principal_mapping, mode=data['mode'])
-            self._log_migration_details(logger, 'localroles', self.results_localroles)
-
-        if 'globalroles' in data['migrations']:
-            logger.info("Starting migration 'globalroles'")
-            self.results_globalroles = migrate_globalroles(
-                context, principal_mapping, mode=data['mode'])
-            self._log_migration_details(logger, 'globalroles', self.results_globalroles)
-
+        # Post-migration hooks
         post_migration_hooks = self._get_hooks(
             data['post_migration_hooks'], IPostMigrationHook)
 
@@ -302,7 +280,8 @@ class UserMigrationForm(form.Form):
             hook_results = hook.execute(principal_mapping, data['mode'])
             self.results_post_migration[name] = hook_results
             for section in hook_results.keys():
-                self._log_migration_details(logger, section, hook_results[section])
+                self._log_migration_details(
+                    logger, section, hook_results[section])
 
         logger.info("Migration finished")
         if self.log_to_file:

@@ -47,8 +47,8 @@
     </tal:pre-migration-hooks>
 
 
-    <tal:users repeat="mode python:view.results_users.keys()">
-    <tal:block define="rows python:view.results_users[mode]"
+    <tal:users repeat="mode python:view.results['users'].keys()">
+    <tal:block define="rows python:view.results['users'][mode]"
                condition="rows">
     <h2>Users <span tal:replace="mode" /></h2>
     <table class="listing">
@@ -65,8 +65,8 @@
     </tal:users>
 
 
-    <tal:properties repeat="mode python:view.results_properties.keys()">
-    <tal:block define="rows python:view.results_properties[mode]"
+    <tal:properties repeat="mode python:view.results['properties'].keys()">
+    <tal:block define="rows python:view.results['properties'][mode]"
                condition="rows">
     <h2>User / Group Properties <span tal:replace="mode" /></h2>
     <table class="listing">
@@ -83,8 +83,8 @@
     </tal:properties>
 
 
-    <tal:localroles repeat="mode python:view.results_localroles.keys()">
-    <tal:block define="rows python:view.results_localroles[mode]"
+    <tal:localroles repeat="mode python:view.results['localroles'].keys()">
+    <tal:block define="rows python:view.results['localroles'][mode]"
                condition="rows">
     <h2>Local roles <span tal:replace="mode" /></h2>
     <table class="listing">
@@ -103,8 +103,8 @@
     </tal:localroles>
 
 
-    <tal:globalroles repeat="mode python:view.results_globalroles.keys()">
-    <tal:block define="rows python:view.results_globalroles[mode]"
+    <tal:globalroles repeat="mode python:view.results['globalroles'].keys()">
+    <tal:block define="rows python:view.results['globalroles'][mode]"
                condition="rows">
     <h2>Global roles <span tal:replace="mode" /></h2>
     <table class="listing">
@@ -123,8 +123,8 @@
     </tal:globalroles>
 
 
-    <tal:dashboards repeat="mode python:view.results_dashboard.keys()">
-    <tal:block define="rows python:view.results_dashboard[mode]"
+    <tal:dashboards repeat="mode python:view.results['dashboard'].keys()">
+    <tal:block define="rows python:view.results['dashboard'][mode]"
                condition="rows">
     <h2>Dashboards <span tal:replace="mode" /></h2>
     <table class="listing">
@@ -143,8 +143,8 @@
     </tal:dashboards>
 
 
-    <tal:homefolders repeat="mode python:view.results_homefolder.keys()">
-    <tal:block define="rows python:view.results_homefolder[mode]"
+    <tal:homefolders repeat="mode python:view.results['homefolder'].keys()">
+    <tal:block define="rows python:view.results['homefolder'][mode]"
                condition="rows">
     <h2>Homefolders <span tal:replace="mode" /></h2>
     <table class="listing">
