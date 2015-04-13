@@ -4,7 +4,7 @@ Changelog
 1.1 (unreleased)
 ----------------
 
-- Add logging of detailed migration results to logfile.
+- Add logging of detailed migration results to logfile (optional).
   [lgraf]
 
 - Add migration for global roles (portal_role_manager).
