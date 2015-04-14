@@ -140,6 +140,15 @@ class IUserMigrationFormSchema(interface.Interface):
                       ' written to a logfile on the filesystem.'),
     )
 
+    summary = schema.Bool(
+        title=_(u'label_summary', default=u'Summary only'),
+        default=False,
+        description=_(u'help_summary',
+                      default=u'Only display a summary after migration '
+                      'instead of a full, detailed report. Recommended for '
+                      'large migrations.'),
+    )
+
     dry_run = schema.Bool(
         title=_(u'label_dry_run', default=u'Dry Run'),
         default=False,
@@ -161,6 +170,7 @@ class UserMigrationForm(form.Form):
         self.results = defaultdict(dict)
         self.results_post_migration = {}
         self.log_to_file = False
+        self.summary = defaultdict(list)
 
     def _get_manual_mapping(self, formdata):
         manual_mapping = formdata['manual_mapping']
@@ -222,6 +232,30 @@ class UserMigrationForm(form.Form):
                 logger.debug("Migrated [{0}] {1}: {2} -> {3}".format(
                     name, obj, old, new))
 
+    def _summarize_hook_results(self, hook_results):
+        hook_results_summary = []
+        for migration, steps in hook_results.items():
+            for step, mode_results in steps.items():
+                step_totals = [len(mode_results[mode])
+                               for mode in ('moved', 'copied', 'deleted')]
+                hook_results_summary.append(
+                    [migration, step] + step_totals)
+        return hook_results_summary
+
+    def _summarize_results(self):
+        self.summary['pre-migration'] = self._summarize_hook_results(
+            self.results_pre_migration)
+
+        builtin_results_summary = []
+        for migration, mode_results in self.results.items():
+            migration_totals = [len(mode_results[mode])
+                                for mode in ('moved', 'copied', 'deleted')]
+            builtin_results_summary.append([migration] + migration_totals)
+        self.summary['builtin'] = builtin_results_summary
+
+        self.summary['post-migration'] = self._summarize_hook_results(
+            self.results_post_migration)
+
     @button.buttonAndHandler(u'Migrate')
     def handleMigrate(self, action):
         context = aq_inner(self.context)
@@ -258,9 +292,9 @@ class UserMigrationForm(form.Form):
             logger.info("Starting migration '{0}'".format(name))
             hook_results = hook.execute(principal_mapping, data['mode'])
             self.results_pre_migration[name] = hook_results
-            for section in hook_results.keys():
+            for step in hook_results.keys():
                 self._log_migration_details(
-                    logger, section, hook_results[section])
+                    logger, step, hook_results[step])
 
         # Builtin migrations
         for name, migration in BUILTIN_MIGRATIONS.items():
@@ -279,16 +313,20 @@ class UserMigrationForm(form.Form):
             logger.info("Starting migration '{0}'".format(name))
             hook_results = hook.execute(principal_mapping, data['mode'])
             self.results_post_migration[name] = hook_results
-            for section in hook_results.keys():
+            for step in hook_results.keys():
                 self._log_migration_details(
-                    logger, section, hook_results[section])
+                    logger, step, hook_results[step])
 
         logger.info("Migration finished")
         if self.log_to_file:
             logger.info("Migration logfile written to {0}".format(
                 logfile_path))
 
-        self.result_template = ViewPageTemplateFile('migration.pt')
+        if data['summary']:
+            self._summarize_results()
+            self.result_template = ViewPageTemplateFile('migration_summary.pt')
+        else:
+            self.result_template = ViewPageTemplateFile('migration.pt')
 
     @button.buttonAndHandler((u"Cancel"))
     def handleCancel(self, action):
