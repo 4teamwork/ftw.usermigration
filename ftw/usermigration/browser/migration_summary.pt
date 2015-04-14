@@ -1,0 +1,84 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="context/main_template/macros/master"
+      i18n:domain="ftw.usermigration">
+<body>
+
+<metal:title fill-slot="content-title">
+    <h1 class="documentFirstHeading">User / Group Migration Summary</h1>
+</metal:title>
+
+<metal:description fill-slot="content-description"></metal:description>
+
+<metal:content-core fill-slot="content-core">
+    <metal:content-core define-macro="content-core">
+
+    <tal:pre-migration define="summary python:view.summary['pre-migration']"
+                       condition="summary">
+        <h2>Pre-Migration Hooks</h2>
+        <table class="listing">
+            <tr>
+                <th>Migration</th>
+                <th>Step</th>
+                <th>Moved</th>
+                <th>Copied</th>
+                <th>Deleted</th>
+            </tr>
+            <tr tal:repeat="row summary">
+                <td tal:content="python: row[0]" />
+                <td tal:content="python: row[1]" />
+                <td tal:content="python: row[2]" />
+                <td tal:content="python: row[3]" />
+                <td tal:content="python: row[4]" />
+            </tr>
+        </table>
+    </tal:pre-migration>
+
+    <tal:builtin define="summary python:view.summary['builtin']"
+                       condition="summary">
+        <h2>Builtin Migrations</h2>
+        <table class="listing">
+            <tr>
+                <th>Migration</th>
+                <th>Moved</th>
+                <th>Copied</th>
+                <th>Deleted</th>
+            </tr>
+            <tr tal:repeat="row summary">
+                <td tal:content="python: row[0]" />
+                <td tal:content="python: row[1]" />
+                <td tal:content="python: row[2]" />
+                <td tal:content="python: row[3]" />
+            </tr>
+        </table>
+    </tal:builtin>
+
+    <tal:post-migration define="summary python:view.summary['post-migration']"
+                        condition="summary">
+        <h2>Post-Migration Hooks</h2>
+        <table class="listing">
+            <tr>
+                <th>Migration</th>
+                <th>Step</th>
+                <th>Moved</th>
+                <th>Copied</th>
+                <th>Deleted</th>
+            </tr>
+            <tr tal:repeat="row summary">
+                <td tal:content="python: row[0]" />
+                <td tal:content="python: row[1]" />
+                <td tal:content="python: row[2]" />
+                <td tal:content="python: row[3]" />
+                <td tal:content="python: row[4]" />
+            </tr>
+        </table>
+    </tal:post-migration>
+
+    </metal:content-core>
+</metal:content-core>
+
+</body>
+</html>

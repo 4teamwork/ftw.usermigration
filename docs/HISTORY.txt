@@ -4,6 +4,9 @@ Changelog
 1.1 (unreleased)
 ----------------
 
+- Add option to only display a summary of the migration results.
+  [lgraf]
+
 - Add logging of detailed migration results to logfile (optional).
   [lgraf]
 
