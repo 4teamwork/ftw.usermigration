@@ -1,3 +1,6 @@
+obj_counter = 0
+
+
 def migrate_localroles(context, mapping, mode='move', replace=False):
     """Recursively migrate local roles on the given context."""
 
@@ -24,6 +27,7 @@ def migrate_localroles(context, mapping, mode='move', replace=False):
         return False
 
     def migrate_and_recurse(context):
+        global obj_counter
         local_roles = context.get_local_roles()
         path = '/'.join(context.getPhysicalPath())
         for role in local_roles:
@@ -47,11 +51,16 @@ def migrate_localroles(context, mapping, mode='move', replace=False):
                         deleted.append((path, old_id, None))
 
         for obj in context.objectValues():
+            obj_counter += 1
+            if obj_counter % 100 == 0:
+                print "Localroles: Migrating object %s..." % obj_counter
             migrate_and_recurse(obj)
 
     migrate_and_recurse(context)
 
-    for path in reindex_paths:
+    for i, path in enumerate(reindex_paths):
+        if i % 100 == 0:
+            print "Localroles: Reindexing object %s..." % i
         obj = context.unrestrictedTraverse(path)
         obj.reindexObjectSecurity()
 
