@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.1 (unreleased)
+1.1 (2015-04-17)
 ----------------
 
 - Add option to only display a summary of the migration results.
