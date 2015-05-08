@@ -133,7 +133,7 @@ Links
   https://github.com/4teamwork/ftw.usermigration
 - Issue tracker:
   https://github.com/4teamwork/ftw.usermigration/issues
-- Package on pypi: http://pypi.python.org/pypi/ftw.usermigration
+- Pypi: http://pypi.python.org/pypi/ftw.usermigration
 - Continuous integration: https://jenkins.4teamwork.ch/search?q=ftw.usermigration
 
 
