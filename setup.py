@@ -31,6 +31,7 @@ setup(name='ftw.usermigration',
       include_package_data=True,
       zip_safe=False,
       install_requires=[
+          'Plone',
           'setuptools',
       ],
       tests_require=tests_require,
