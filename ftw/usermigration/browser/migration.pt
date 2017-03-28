@@ -65,6 +65,26 @@
     </tal:users>
 
 
+    <tal:group_members repeat="mode python:view.results['group_members'].keys()">
+    <tal:block define="rows python:view.results['group_members'][mode]"
+               condition="rows">
+    <h2>Group Members <span tal:replace="mode" /></h2>
+    <table class="listing">
+        <tr>
+            <th>GroupID</th>
+            <th>Old UserId</th>
+            <th>New UserId</th>
+        </tr>
+        <tr tal:repeat="row rows">
+            <td tal:content="python: row[0]" />
+            <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
+        </tr>
+    </table>
+    </tal:block>
+    </tal:group_members>
+
+
     <tal:properties repeat="mode python:view.results['properties'].keys()">
     <tal:block define="rows python:view.results['properties'][mode]"
                condition="rows">

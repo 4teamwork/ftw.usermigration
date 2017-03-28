@@ -4,6 +4,8 @@ Changelog
 1.2 (unreleased)
 ----------------
 
+- Implement group members migration [elioschmutz]
+
 - Drop Plone 4.1 support. [jone]
 
 

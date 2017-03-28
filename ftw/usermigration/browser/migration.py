@@ -4,6 +4,7 @@ from datetime import datetime
 from ftw.usermigration import _
 from ftw.usermigration.dashboard import migrate_dashboards
 from ftw.usermigration.globalroles import migrate_globalroles
+from ftw.usermigration.group_members import migrate_group_members
 from ftw.usermigration.homefolder import migrate_homefolders
 from ftw.usermigration.interfaces import IPostMigrationHook
 from ftw.usermigration.interfaces import IPreMigrationHook
@@ -33,6 +34,7 @@ import transaction
 
 BUILTIN_MIGRATIONS = {
     'users': migrate_users,
+    'group_members': migrate_group_members,
     'properties': migrate_properties,
     'dashboard': migrate_dashboards,
     'homefolder': migrate_homefolders,
@@ -85,6 +87,7 @@ class IUserMigrationFormSchema(interface.Interface):
         value_type=schema.Choice(
             vocabulary=SimpleVocabulary([
                 SimpleTerm('users', 'users', _(u'Users')),
+                SimpleTerm('group_members', 'group_members', _(u'Group Members')),
                 SimpleTerm('localroles', 'localroles', _(u'Local Roles')),
                 SimpleTerm('globalroles', 'globalroles', _(u'Global Roles')),
                 SimpleTerm('dashboard', 'dashboard', _(u"Dashboard")),

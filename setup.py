@@ -8,6 +8,7 @@ tests_require = [
     'ftw.testing',
     'ftw.builder',
     'ftw.testbrowser',
+    'plone.api',
     ]
 
 setup(name='ftw.usermigration',
