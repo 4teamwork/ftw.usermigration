@@ -4,6 +4,8 @@ Changelog
 1.2 (unreleased)
 ----------------
 
+- Fix migrating users whose username is the beginning of another username [elioschmutz]
+
 - Implement group members migration [elioschmutz]
 
 - Drop Plone 4.1 support. [jone]

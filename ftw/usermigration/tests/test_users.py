@@ -1,5 +1,6 @@
 from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
 from ftw.usermigration.users import migrate_users
+from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from Products.CMFCore.utils import getToolByName
@@ -116,3 +117,21 @@ class TestUsers(TestCase):
             (),
             uf.searchUsers(id='john.deo')
         )
+
+    def test_migrate_userid_which_is_a_substring_of_another_userid(self):
+        portal = self.layer['portal']
+
+        mtool = getToolByName(portal, 'portal_membership', None)
+        mtool.addMember('steve', 'password', ['Member'], [])
+        mtool.addMember('steven', 'password', ['Member'], [])
+
+        mapping = {'steve': 'john.doe'}
+        results = migrate_users(portal, mapping)
+
+        self.assertItemsEqual([('acl_users', 'steve', 'john.doe')], results['moved'])
+        self.assertEquals([], results['copied'])
+        self.assertEquals([], results['deleted'])
+
+        self.assertEquals('john.doe', api.user.get('john.doe').getId())
+        self.assertIsNone(api.user.get('steve'))
+        self.assertEquals(('steven'), api.user.get('steven').getId())

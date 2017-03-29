@@ -1,5 +1,6 @@
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.utils import safe_hasattr
+from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin
 
 
 def migrate_users(context, mapping, mode='move', replace=False):
@@ -13,14 +14,13 @@ def migrate_users(context, mapping, mode='move', replace=False):
     uf = getToolByName(context, 'acl_users')
 
     for old_userid, new_userid in mapping.items():
-        users = uf.searchUsers(id=old_userid)
-        if len(users) > 0:
-            for user in users:
-                plugin = uf.get(user['pluginid'])
-                # Only ZODB User Manager is supported
-                if (safe_hasattr(plugin, '_user_passwords') and
-                        safe_hasattr(plugin, '_login_to_userid') and
-                        safe_hasattr(plugin, '_userid_to_login')):
+        for plugin_id, plugin in uf.plugins.listPlugins(IUserEnumerationPlugin):
+            # Only ZODB User Manager is supported
+            if (safe_hasattr(plugin, '_user_passwords') and
+                    safe_hasattr(plugin, '_login_to_userid') and
+                    safe_hasattr(plugin, '_userid_to_login')):
+
+                for user in plugin.enumerateUsers(id=old_userid, exact_match=True):
                     pw = plugin._user_passwords[old_userid]
                     login = plugin._userid_to_login[old_userid]
 
