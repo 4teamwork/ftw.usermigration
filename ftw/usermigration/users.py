@@ -1,6 +1,6 @@
 from Products.CMFCore.utils import getToolByName
-from Products.CMFPlone.utils import safe_hasattr
 from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlugin
+from Products.PluggableAuthService.plugins.ZODBUserManager import IZODBUserManager
 
 
 def migrate_users(context, mapping, mode='move', replace=False):
@@ -16,39 +16,38 @@ def migrate_users(context, mapping, mode='move', replace=False):
     for old_userid, new_userid in mapping.items():
         for plugin_id, plugin in uf.plugins.listPlugins(IUserEnumerationPlugin):
             # Only ZODB User Manager is supported
-            if (safe_hasattr(plugin, '_user_passwords') and
-                    safe_hasattr(plugin, '_login_to_userid') and
-                    safe_hasattr(plugin, '_userid_to_login')):
+            if not IZODBUserManager.providedBy(plugin):
+                continue
 
-                for user in plugin.enumerateUsers(id=old_userid, exact_match=True):
-                    pw = plugin._user_passwords[old_userid]
-                    login = plugin._userid_to_login[old_userid]
+            for user in plugin.enumerateUsers(id=old_userid, exact_match=True):
+                pw = plugin._user_passwords[old_userid]
+                login = plugin._userid_to_login[old_userid]
 
-                    # Do nothing if a user with new_userid already exists and
-                    # replace is False.
-                    if new_userid in plugin._user_passwords and not replace:
-                        continue
+                # Do nothing if a user with new_userid already exists and
+                # replace is False.
+                if new_userid in plugin._user_passwords and not replace:
+                    continue
 
-                    if mode in ['move', 'delete']:
-                        del plugin._user_passwords[old_userid]
-                        del plugin._userid_to_login[old_userid]
-                        del plugin._login_to_userid[login]
+                if mode in ['move', 'delete']:
+                    del plugin._user_passwords[old_userid]
+                    del plugin._userid_to_login[old_userid]
+                    del plugin._login_to_userid[login]
 
-                    if mode in ['copy', 'move']:
-                        # If userid and login are the same or if in copy mode,
-                        # set login to new userid.
-                        if login == old_userid or mode == 'copy':
-                            login = new_userid
+                if mode in ['copy', 'move']:
+                    # If userid and login are the same or if in copy mode,
+                    # set login to new userid.
+                    if login == old_userid or mode == 'copy':
+                        login = new_userid
 
-                        plugin._user_passwords[new_userid] = pw
-                        plugin._login_to_userid[login] = new_userid
-                        plugin._userid_to_login[new_userid] = login
+                    plugin._user_passwords[new_userid] = pw
+                    plugin._login_to_userid[login] = new_userid
+                    plugin._userid_to_login[new_userid] = login
 
-                    if mode == 'move':
-                        moved.append(('acl_users', old_userid, new_userid))
-                    if mode == 'copy':
-                        copied.append(('acl_users', old_userid, new_userid))
-                    if mode == 'delete':
-                        deleted.append(('acl_users', old_userid, None))
+                if mode == 'move':
+                    moved.append(('acl_users', old_userid, new_userid))
+                if mode == 'copy':
+                    copied.append(('acl_users', old_userid, new_userid))
+                if mode == 'delete':
+                    deleted.append(('acl_users', old_userid, None))
 
     return(dict(moved=moved, copied=copied, deleted=deleted))
