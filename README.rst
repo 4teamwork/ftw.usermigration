@@ -11,15 +11,13 @@ Currently the following user data can be migrated:
 
 - User Properties (ZODB Mutable Property Provider)
 
+- Group Members
+
 - Local Roles
 
 - Dashboards
 
 - Home Folders
-
-Todo:
-
-- Groups
 
 
 Installation
