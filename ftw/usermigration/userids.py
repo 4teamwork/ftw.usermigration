@@ -3,8 +3,8 @@ from Products.PluggableAuthService.interfaces.plugins import IUserEnumerationPlu
 from Products.PluggableAuthService.plugins.ZODBUserManager import IZODBUserManager
 
 
-def migrate_users(context, mapping, mode='move', replace=False):
-    """Migrate Plone users."""
+def migrate_userids(context, mapping, mode='move', replace=False):
+    """Migrate Plone userids."""
 
     # Statistics
     moved = []

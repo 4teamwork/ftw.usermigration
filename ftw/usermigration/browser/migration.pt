@@ -47,10 +47,10 @@
     </tal:pre-migration-hooks>
 
 
-    <tal:users repeat="mode python:view.results['users'].keys()">
-    <tal:block define="rows python:view.results['users'][mode]"
+    <tal:userids repeat="mode python:view.results['userids'].keys()">
+    <tal:block define="rows python:view.results['userids'][mode]"
                condition="rows">
-    <h2>Users <span tal:replace="mode" /></h2>
+    <h2>Userids <span tal:replace="mode" /></h2>
     <table class="listing">
         <tr>
             <th>Old UserId</th>
@@ -62,7 +62,7 @@
         </tr>
     </table>
     </tal:block>
-    </tal:users>
+    </tal:userids>
 
 
     <tal:group_members repeat="mode python:view.results['group_members'].keys()">

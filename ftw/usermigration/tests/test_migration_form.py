@@ -69,7 +69,7 @@ class TestMigrationForm(TestCase):
         mapping = make_mapping({'old_john': 'new_john'})
         browser.fill(
             {'Manual Principal Mapping': mapping,
-             'Migrations': ['users']}
+             'Migrations': ['userids']}
         ).submit()
 
         self.assertEquals(1, len(self.uf.searchUsers(id='new_john')))
@@ -91,7 +91,7 @@ class TestMigrationForm(TestCase):
         browser.login().visit(view='user-migration')
 
         browser.fill(
-            {'Migrations': ['users']}
+            {'Migrations': ['userids']}
         ).submit()
 
         self.assertIn(
@@ -109,7 +109,7 @@ class TestMigrationForm(TestCase):
         mapping = make_mapping({'old_john': 'new_john'})
         browser.fill(
             {'Manual Principal Mapping': mapping,
-             'Migrations': ['users', 'properties', 'dashboard',
+             'Migrations': ['userids', 'properties', 'dashboard',
                             'homefolder', 'localroles'],
              'Dry Run': True}
         ).submit()
@@ -131,7 +131,7 @@ class TestMigrationForm(TestCase):
 
         browser.fill(
             {'Principal Mapping Source': 'some-migration-mapping',
-             'Migrations': ['users']}
+             'Migrations': ['userids']}
         ).submit()
 
         self.assertEquals(1, len(self.uf.searchUsers(id='new_john')))
@@ -183,7 +183,7 @@ class TestMigrationForm(TestCase):
                                 'old_jack': 'new_jack'})
         browser.fill(
             {'Manual Principal Mapping': mapping,
-             'Migrations': ['users', 'localroles']}
+             'Migrations': ['userids', 'localroles']}
         ).submit()
 
         user = self.uf.searchUsers(id='new_john')[0]
@@ -205,7 +205,7 @@ class TestMigrationForm(TestCase):
                                 'old_jack': 'new_jack'})
         browser.fill(
             {'Manual Principal Mapping': mapping,
-             'Migrations': ['users', 'localroles'],
+             'Migrations': ['userids', 'localroles'],
              'Mode': 'copy'}
         ).submit()
 

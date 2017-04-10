@@ -1,5 +1,5 @@
 from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
-from ftw.usermigration.users import migrate_users
+from ftw.usermigration.userids import migrate_userids
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
@@ -7,7 +7,7 @@ from Products.CMFCore.utils import getToolByName
 from unittest2 import TestCase
 
 
-class TestUsers(TestCase):
+class TestUserIds(TestCase):
 
     layer = USERMIGRATION_INTEGRATION_TESTING
 
@@ -21,10 +21,10 @@ class TestUsers(TestCase):
         mtool.addMember('jack', 'password', ['Member'], [])
         mtool.addMember('peter', 'password', ['Member'], [])
 
-    def test_migrate_users(self):
+    def test_migrate_userids(self):
         portal = self.layer['portal']
         mapping = {'user1': 'john.doe'}
-        results = migrate_users(portal, mapping)
+        results = migrate_userids(portal, mapping)
 
         self.assertIn(('acl_users', 'user1', 'john.doe'), results['moved'])
         self.assertEquals([], results['copied'])
@@ -47,7 +47,7 @@ class TestUsers(TestCase):
     def test_migrate_to_existing_user_without_replace(self):
         portal = self.layer['portal']
         mapping = {'user1': 'jack'}
-        results = migrate_users(portal, mapping)
+        results = migrate_userids(portal, mapping)
         self.assertEquals([], results['moved'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['deleted'])
@@ -61,7 +61,7 @@ class TestUsers(TestCase):
     def test_migrate_to_existing_user_with_replace(self):
         portal = self.layer['portal']
         mapping = {'user1': 'jack'}
-        results = migrate_users(portal, mapping, replace=True)
+        results = migrate_userids(portal, mapping, replace=True)
         self.assertIn(('acl_users', 'user1', 'jack'), results['moved'])
         self.assertEquals([], results['copied'])
         self.assertEquals([], results['deleted'])
@@ -79,7 +79,7 @@ class TestUsers(TestCase):
     def test_copy_users(self):
         portal = self.layer['portal']
         mapping = {'user1': 'john.doe'}
-        results = migrate_users(portal, mapping, mode='copy')
+        results = migrate_userids(portal, mapping, mode='copy')
 
         self.assertIn(('acl_users', 'user1', 'john.doe'), results['copied'])
         self.assertEquals([], results['moved'])
@@ -102,7 +102,7 @@ class TestUsers(TestCase):
     def test_delete_users(self):
         portal = self.layer['portal']
         mapping = {'user1': 'john.doe'}
-        results = migrate_users(portal, mapping, mode='delete')
+        results = migrate_userids(portal, mapping, mode='delete')
 
         self.assertIn(('acl_users', 'user1', None), results['deleted'])
         self.assertEquals([], results['moved'])
@@ -126,7 +126,7 @@ class TestUsers(TestCase):
         mtool.addMember('steven', 'password', ['Member'], [])
 
         mapping = {'steve': 'john.doe'}
-        results = migrate_users(portal, mapping)
+        results = migrate_userids(portal, mapping)
 
         self.assertItemsEqual([('acl_users', 'steve', 'john.doe')], results['moved'])
         self.assertEquals([], results['copied'])

@@ -11,7 +11,7 @@ from ftw.usermigration.interfaces import IPreMigrationHook
 from ftw.usermigration.interfaces import IPrincipalMappingSource
 from ftw.usermigration.localroles import migrate_localroles
 from ftw.usermigration.properties import migrate_properties
-from ftw.usermigration.users import migrate_users
+from ftw.usermigration.userids import migrate_userids
 from ftw.usermigration.utils import get_var_log
 from ftw.usermigration.utils import mkdir_p
 from ftw.usermigration.vocabularies import USE_MANUAL_MAPPING
@@ -33,7 +33,7 @@ import transaction
 
 
 BUILTIN_MIGRATIONS = {
-    'users': migrate_users,
+    'userids': migrate_userids,
     'group_members': migrate_group_members,
     'properties': migrate_properties,
     'dashboard': migrate_dashboards,
@@ -86,7 +86,7 @@ class IUserMigrationFormSchema(interface.Interface):
                       'migrations that should be run.'),
         value_type=schema.Choice(
             vocabulary=SimpleVocabulary([
-                SimpleTerm('users', 'users', _(u'Users')),
+                SimpleTerm('userids', 'userids', _(u'Userids')),
                 SimpleTerm('group_members', 'group_members', _(u'Group Members')),
                 SimpleTerm('localroles', 'localroles', _(u'Local Roles')),
                 SimpleTerm('globalroles', 'globalroles', _(u'Global Roles')),
