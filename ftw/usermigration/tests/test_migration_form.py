@@ -191,6 +191,29 @@ class TestMigrationForm(TestCase):
         # New user's userid is correct
         self.assertEquals('new_john', user['userid'])
 
+        # Login of new user is sill the old one (login migration
+        # is a separate migration step)
+        self.assertEquals('old_john', user['login'])
+
+        # Old user is gone
+        self.assertEquals((), self.uf.searchUsers(id='old_john'))
+
+    @browsing
+    def test_form_user_move_with_loginname(self, browser):
+        browser.login().visit(view='user-migration')
+
+        mapping = make_mapping({'old_john': 'new_john',
+                                'old_jack': 'new_jack'})
+        browser.fill(
+            {'Manual Principal Mapping': mapping,
+             'Migrations': ['loginnames', 'userids']}
+        ).submit()
+
+        user = self.uf.searchUsers(id='new_john')[0]
+
+        # New user's userid is correct
+        self.assertEquals('new_john', user['userid'])
+
         # Login of new user has been set to userid
         self.assertEquals('new_john', user['login'])
 

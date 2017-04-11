@@ -34,9 +34,10 @@ def migrate_userids(context, mapping, mode='move', replace=False):
                     del plugin._login_to_userid[login]
 
                 if mode in ['copy', 'move']:
-                    # If userid and login are the same or if in copy mode,
-                    # set login to new userid.
-                    if login == old_userid or mode == 'copy':
+                    # We set the login-name to the new userid on user-copy.
+                    # We do this because we don't want two users with the same
+                    # loginname.
+                    if mode == 'copy':
                         login = new_userid
 
                     plugin._user_passwords[new_userid] = pw

@@ -36,7 +36,7 @@ class TestUserIds(TestCase):
             uf.searchUsers(id='john.doe')[0]['userid']
         )
         self.assertEquals(
-            'john.doe',
+            'user1',
             uf.searchUsers(id='john.doe')[0]['login']
         )
         self.assertEquals(

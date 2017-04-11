@@ -46,15 +46,33 @@
     </tal:hook_results>
     </tal:pre-migration-hooks>
 
+    <tal:loginnames repeat="mode python:view.results['loginnames'].keys()">
+    <tal:block define="rows python:view.results['loginnames'][mode]"
+               condition="rows">
+    <h2>Login Names <span tal:replace="mode" /></h2>
+    <table class="listing">
+        <tr>
+            <th>UserId</th>
+            <th>Old Login Name</th>
+            <th>New Login Name</th>
+        </tr>
+        <tr tal:repeat="row rows">
+            <td tal:content="python: row[0]" />
+            <td tal:content="python: row[1]" />
+            <td tal:content="python: row[2]" />
+        </tr>
+    </table>
+    </tal:block>
+    </tal:loginnames>
 
     <tal:userids repeat="mode python:view.results['userids'].keys()">
     <tal:block define="rows python:view.results['userids'][mode]"
                condition="rows">
-    <h2>Userids <span tal:replace="mode" /></h2>
+    <h2>User IDs <span tal:replace="mode" /></h2>
     <table class="listing">
         <tr>
-            <th>Old UserId</th>
-            <th>New UserId</th>
+            <th>Old User ID</th>
+            <th>New User ID</th>
         </tr>
         <tr tal:repeat="row rows">
             <td tal:content="python: row[1]" />
@@ -63,7 +81,6 @@
     </table>
     </tal:block>
     </tal:userids>
-
 
     <tal:group_members repeat="mode python:view.results['group_members'].keys()">
     <tal:block define="rows python:view.results['group_members'][mode]"
