@@ -52,7 +52,7 @@
     <h2>Login Names <span tal:replace="mode" /></h2>
     <table class="listing">
         <tr>
-            <th>UserId</th>
+            <th>User ID</th>
             <th>Old Login Name</th>
             <th>New Login Name</th>
         </tr>
@@ -88,9 +88,9 @@
     <h2>Group Members <span tal:replace="mode" /></h2>
     <table class="listing">
         <tr>
-            <th>GroupID</th>
-            <th>Old UserId</th>
-            <th>New UserId</th>
+            <th>Group ID</th>
+            <th>Old User IDs</th>
+            <th>New User ID</th>
         </tr>
         <tr tal:repeat="row rows">
             <td tal:content="python: row[0]" />
@@ -167,8 +167,8 @@
     <table class="listing">
         <tr>
             <th>Column</th>
-            <th>Old UserId</th>
-            <th>New UserId</th>
+            <th>Old User ID</th>
+            <th>New User ID</th>
         </tr>
         <tr tal:repeat="row rows">
             <td tal:content="python: row[0]" />
@@ -186,8 +186,8 @@
     <h2>Homefolders <span tal:replace="mode" /></h2>
     <table class="listing">
         <tr>
-            <th>Old UserId</th>
-            <th>New UserId</th>
+            <th>Old User ID</th>
+            <th>New User ID</th>
         </tr>
         <tr tal:repeat="row rows">
             <td tal:content="python: row[1]" />
