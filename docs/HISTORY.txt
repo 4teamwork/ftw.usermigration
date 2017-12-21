@@ -4,8 +4,7 @@ Changelog
 1.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Drop Plone 4.2 compatibility. [phgross]
 
 1.2.0 (2017-05-01)
 ------------------
