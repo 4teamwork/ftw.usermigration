@@ -2,10 +2,16 @@ from ftw.builder.testing import BUILDER_LAYER
 from ftw.builder.testing import functional_session_factory
 from ftw.builder.testing import set_builder_session_factory
 from ftw.testing.layer import COMPONENT_REGISTRY_ISOLATION
+from pkg_resources import get_distribution
+from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
+from plone.testing import z2
 from zope.configuration import xmlconfig
+
+
+IS_PLONE_5 = get_distribution('Plone').version >= '5'
 
 
 class UserMigrationLayer(PloneSandboxLayer):
@@ -21,6 +27,16 @@ class UserMigrationLayer(PloneSandboxLayer):
             '  <includePlugins package="plone" />'
             '</configure>',
             context=configurationContext)
+
+        if not IS_PLONE_5:
+            # The tests will fail with a
+            # `ValueError: Index of type DateRecurringIndex not found` unless
+            # the product 'Products.DateRecurringIndex' is installed.
+            z2.installProduct(app, 'Products.DateRecurringIndex')
+
+    def setUpPloneSite(self, portal):
+        super(UserMigrationLayer, self).setUpPloneSite(portal)
+        applyProfile(portal, 'plone.app.contenttypes:default')
 
 
 USERMIGRATION_FIXTURE = UserMigrationLayer()
