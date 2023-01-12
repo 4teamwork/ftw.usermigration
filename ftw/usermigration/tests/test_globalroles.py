@@ -3,7 +3,7 @@ from ftw.builder import create
 from ftw.usermigration.globalroles import migrate_globalroles
 from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
 from Products.CMFCore.utils import getToolByName
-from unittest2 import TestCase
+from unittest import TestCase
 
 
 class TestGlobalRoles(TestCase):

@@ -10,7 +10,7 @@ from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from Products.CMFCore.utils import getToolByName
 from Products.CMFPlone.interfaces.siteroot import IPloneSiteRoot
-from unittest2 import TestCase
+from unittest import TestCase
 from zope.publisher.interfaces.browser import IBrowserRequest
 import transaction
 
