@@ -1,9 +1,9 @@
-from unittest2 import TestCase
+from ftw.usermigration.localroles import migrate_localroles
+from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
-from ftw.usermigration.localroles import migrate_localroles
 from Products.CMFCore.utils import getToolByName
+from unittest import TestCase
 
 
 class TestLocalRoles(TestCase):

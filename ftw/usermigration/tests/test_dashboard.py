@@ -6,7 +6,7 @@ from plone.app.testing import TEST_USER_ID
 from plone.portlets.constants import USER_CATEGORY
 from plone.portlets.interfaces import IPortletManager
 from Products.CMFCore.utils import getToolByName
-from unittest2 import TestCase
+from unittest import TestCase
 from zope.component import queryUtility
 
 

@@ -3,8 +3,7 @@ from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from Products.CMFCore.utils import getToolByName
-from unittest2 import TestCase
+from unittest import TestCase
 
 
 class TestGroupMembers(TestCase):
