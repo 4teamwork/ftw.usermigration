@@ -1,12 +1,12 @@
 from ftw.usermigration.group_members import migrate_group_members
 from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
+from ftw.usermigration.testing import UserMigrationTestCase
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
-from unittest import TestCase
 
 
-class TestGroupMembers(TestCase):
+class TestGroupMembers(UserMigrationTestCase):
 
     layer = USERMIGRATION_INTEGRATION_TESTING
 

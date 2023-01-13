@@ -8,10 +8,17 @@ from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import PloneSandboxLayer
 from plone.testing import z2
+from unittest import TestCase
 from zope.configuration import xmlconfig
 
 
 IS_PLONE_5 = get_distribution('Plone').version >= '5'
+
+
+class UserMigrationTestCase(TestCase):
+
+    def assertItemsEqual(self, expected_seq, actual_seq, msg=None):
+        return self.assertEqual(set(expected_seq), set(actual_seq), msg=msg)
 
 
 class UserMigrationLayer(PloneSandboxLayer):
