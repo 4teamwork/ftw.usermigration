@@ -1,5 +1,6 @@
 from operator import itemgetter
 from Products.CMFCore.utils import getToolByName
+from six.moves import map
 
 
 def migrate_globalroles(context, mapping, mode='move', replace=False):
