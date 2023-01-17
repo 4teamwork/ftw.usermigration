@@ -1,13 +1,13 @@
 from ftw.usermigration.testing import USERMIGRATION_INTEGRATION_TESTING
+from ftw.usermigration.testing import UserMigrationTestCase
 from ftw.usermigration.userids import migrate_userids
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import TEST_USER_ID
 from Products.CMFCore.utils import getToolByName
-from unittest import TestCase
 
 
-class TestUserIds(TestCase):
+class TestUserIds(UserMigrationTestCase):
 
     layer = USERMIGRATION_INTEGRATION_TESTING
 

@@ -4,6 +4,8 @@ Changelog
 1.3.0 (unreleased)
 ------------------
 
+- Add Support for Python 3 and Plone 5.2. [lgraf]
+
 - Add Plone 5.1 compatibility. [phgross]
 
 - Drop Plone 4.2 compatibility. [phgross]
